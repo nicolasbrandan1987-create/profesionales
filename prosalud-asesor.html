@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProSalud — Buscador de Prospectos</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0a1628;--blue:#1a4fd6;--blue-light:#2d6ef7;
+  --teal:#00c9b1;--teal-dark:#009e8c;--gold:#f0b429;
+  --red:#e53e3e;--green:#38a169;--orange:#dd6b20;--purple:#7c3aed;
+  --gray1:#f4f6fb;--gray2:#e2e8f0;--gray3:#94a3b8;--gray4:#64748b;
+  --white:#fff;--text:#1e293b;
+  --shadow:0 4px 24px rgba(10,22,40,.12);--shadow-lg:0 8px 40px rgba(10,22,40,.18);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--gray1);color:var(--text);}
+
+/* HEADER */
+.header{background:var(--navy);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.3);}
+.hbrand{display:flex;align-items:center;gap:10px;}
+.hlogo{width:34px;height:34px;background:linear-gradient(135deg,var(--teal),var(--blue-light));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+.htitle{font-family:'DM Serif Display',serif;font-size:20px;color:#fff;}.htitle span{color:var(--teal);}
+.hsub{font-size:10px;color:var(--gray3);letter-spacing:1.5px;text-transform:uppercase;}
+.hright{display:flex;align-items:center;gap:8px;}
+.asesor-pill{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:20px;padding:5px 14px;font-size:12px;font-weight:600;color:#fff;cursor:pointer;transition:.2s;}
+.asesor-pill:hover{background:rgba(255,255,255,.18);}
+.hbtn{padding:6px 13px;border-radius:8px;border:1.5px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.8);font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;transition:.2s;}
+.hbtn:hover{background:rgba(255,255,255,.1);color:#fff;}
+.hbtn.active{background:var(--teal);border-color:var(--teal);color:#fff;}
+
+/* SELECT ASESOR SCREEN */
+.select-screen{display:flex;align-items:center;justify-content:center;min-height:calc(100vh - 60px);}
+.select-card{background:var(--white);border-radius:24px;padding:48px 40px;width:100%;max-width:500px;box-shadow:var(--shadow-lg);text-align:center;margin:24px;}
+.sel-icon{font-size:52px;margin-bottom:16px;}
+.sel-title{font-family:'DM Serif Display',serif;font-size:26px;color:var(--navy);margin-bottom:6px;}
+.sel-sub{font-size:13px;color:var(--gray3);margin-bottom:28px;}
+.asesor-grid{display:flex;flex-direction:column;gap:8px;text-align:left;}
+.asesor-btn{padding:13px 16px;border-radius:12px;border:1.5px solid var(--gray2);background:var(--gray1);cursor:pointer;transition:.2s;display:flex;align-items:center;gap:12px;font-size:13px;font-weight:500;color:var(--text);}
+.asesor-btn:hover{border-color:var(--blue-light);background:rgba(45,110,247,.05);color:var(--blue);}
+.av{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--navy),var(--blue-light));display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:700;flex-shrink:0;}
+.av-count{margin-left:auto;font-size:11px;color:var(--gray3);}
+
+/* MAIN LAYOUT */
+.app{display:none;}
+.layout{display:grid;grid-template-columns:300px 1fr;min-height:calc(100vh - 60px);}
+
+/* SIDEBAR */
+.sidebar{background:var(--white);border-right:1px solid var(--gray2);padding:22px 18px;display:flex;flex-direction:column;gap:18px;overflow-y:auto;max-height:calc(100vh - 60px);position:sticky;top:60px;}
+.slabel{font-size:10px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--gray3);margin-bottom:8px;}
+.fld{display:flex;flex-direction:column;gap:5px;}
+.fld label{font-size:12px;font-weight:500;color:var(--gray4);}
+input[type=text],input[type=number],select{width:100%;padding:9px 12px;border:1.5px solid var(--gray2);border-radius:9px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--gray1);outline:none;transition:.2s;}
+input:focus,select:focus{border-color:var(--blue-light);background:var(--white);}
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.spec-chip{padding:8px 8px;border-radius:9px;border:1.5px solid var(--gray2);background:var(--gray1);font-size:11px;font-weight:500;color:var(--gray4);cursor:pointer;transition:.2s;display:flex;align-items:center;gap:5px;user-select:none;}
+.spec-chip:hover{border-color:var(--blue-light);color:var(--blue);}
+.spec-chip.active{border-color:var(--blue-light);background:rgba(45,110,247,.08);color:var(--blue);font-weight:600;}
+.btn-buscar{width:100%;padding:12px;background:linear-gradient(135deg,var(--blue),var(--blue-light));color:#fff;border:none;border-radius:11px;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer;transition:.2s;box-shadow:0 4px 14px rgba(26,79,214,.3);}
+.btn-buscar:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(26,79,214,.4);}
+.btn-buscar:active{transform:translateY(0);}
+
+/* CONTENT */
+.content{padding:22px 24px;overflow-y:auto;max-height:calc(100vh - 60px);}
+
+/* VISTA TABS */
+.vtabs{display:flex;gap:4px;margin-bottom:20px;background:var(--white);border-radius:12px;padding:4px;box-shadow:var(--shadow);width:fit-content;}
+.vtab{padding:8px 18px;border-radius:9px;font-size:13px;font-weight:500;color:var(--gray4);cursor:pointer;transition:.2s;}
+.vtab:hover{color:var(--blue);}
+.vtab.active{background:var(--navy);color:#fff;font-weight:600;}
+
+/* STATS BAR */
+.stats-bar{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;}
+.sbox{background:var(--white);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);border-top:3px solid transparent;}
+.sbox.s0{border-top-color:var(--blue-light);}
+.sbox.s1{border-top-color:var(--gold);}
+.sbox.s2{border-top-color:var(--orange);}
+.sbox.s3{border-top-color:var(--purple);}
+.sbox.s4{border-top-color:var(--green);}
+.sbox-num{font-family:'DM Serif Display',serif;font-size:24px;color:var(--navy);}
+.sbox-lbl{font-size:11px;color:var(--gray3);margin-top:1px;}
+.sbox-pct{font-size:10px;color:var(--teal-dark);font-weight:600;margin-top:2px;}
+
+/* RESULTADOS BUSQUEDA */
+.results-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.results-title{font-size:14px;font-weight:600;color:var(--navy);}
+.results-sub{font-size:12px;color:var(--gray3);}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+
+/* PROSPECT CARD */
+.pcard{background:var(--white);border-radius:14px;padding:16px;box-shadow:var(--shadow);border:1.5px solid transparent;transition:.2s;position:relative;}
+.pcard:hover{border-color:var(--gray2);box-shadow:var(--shadow-lg);transform:translateY(-2px);}
+.pcard.en-pipeline{border-color:var(--teal);background:rgba(0,201,177,.03);}
+.pcard-top{display:flex;gap:10px;align-items:flex-start;margin-bottom:10px;}
+.pcard-icon{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--navy),var(--blue-light));display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.pcard-name{font-size:14px;font-weight:600;color:var(--navy);line-height:1.3;}
+.pcard-spec{font-size:11px;color:var(--gray4);margin-top:1px;}
+.pcard-rating{font-size:11px;font-weight:700;color:var(--gold);margin-left:auto;white-space:nowrap;}
+.pcard-info{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.pinfo-row{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--gray4);}
+.pinfo-row .ico{width:14px;text-align:center;font-size:12px;}
+.pcard-footer{display:flex;gap:7px;align-items:center;}
+.btn-pipeline{flex:1;padding:8px;border-radius:8px;background:var(--blue);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;transition:.2s;}
+.btn-pipeline:hover{background:var(--blue-light);}
+.btn-pipeline.added{background:var(--teal);cursor:default;}
+.btn-wa{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--gray2);background:var(--gray1);cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;font-size:14px;}
+.btn-wa:hover{border-color:#25d366;background:rgba(37,211,102,.07);}
+.btn-li{width:32px;height:32px;border-radius:8px;border:1.5px solid var(--gray2);background:var(--gray1);cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#0077b5;}
+.btn-li:hover{border-color:#0077b5;background:rgba(0,119,181,.07);}
+.pipeline-badge{position:absolute;top:10px;right:10px;background:var(--teal);color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:8px;letter-spacing:.5px;}
+
+/* PIPELINE VIEW */
+.pipe-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;flex-wrap:wrap;}
+.pipe-filters{display:flex;gap:6px;flex-wrap:wrap;}
+.fpill{padding:6px 13px;border-radius:16px;border:1.5px solid var(--gray2);background:var(--white);font-size:11px;font-weight:500;color:var(--gray4);cursor:pointer;transition:.2s;}
+.fpill:hover{border-color:var(--blue-light);color:var(--blue);}
+.fpill.active{background:var(--navy);color:#fff;border-color:var(--navy);}
+.pipe-right{display:flex;gap:7px;}
+.bsm{padding:7px 13px;border-radius:8px;border:1.5px solid var(--gray2);background:var(--white);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;color:var(--gray4);cursor:pointer;transition:.2s;display:flex;align-items:center;gap:4px;}
+.bsm:hover{border-color:var(--blue-light);color:var(--blue);}
+.bsm.primary{background:var(--teal);color:#fff;border-color:var(--teal);font-weight:600;}
+.bsm.primary:hover{background:var(--teal-dark);}
+
+/* PIPELINE TABLE */
+.ptable-wrap{background:var(--white);border-radius:14px;box-shadow:var(--shadow);overflow:hidden;}
+table{width:100%;border-collapse:collapse;}
+thead th{padding:11px 14px;font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gray3);background:var(--gray1);text-align:left;border-bottom:1px solid var(--gray2);}
+tbody tr{border-bottom:1px solid var(--gray2);transition:.12s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:hover{background:rgba(45,110,247,.02);}
+td{padding:11px 14px;font-size:12px;vertical-align:middle;}
+td.nm{font-weight:600;color:var(--navy);font-size:13px;}
+.ssel{padding:5px 8px;border-radius:7px;border:1.5px solid var(--gray2);font-family:'DM Sans',sans-serif;font-size:11px;font-weight:500;color:var(--text);background:var(--gray1);outline:none;cursor:pointer;}
+.sbadge{display:inline-flex;align-items:center;gap:3px;padding:3px 9px;border-radius:9px;font-size:10px;font-weight:600;}
+.sb-pendiente{background:#eff6ff;color:#1d4ed8;}
+.sb-contactado{background:#fefce8;color:#854d0e;}
+.sb-reunion{background:#fff7ed;color:#9a3412;}
+.sb-cotizado{background:#faf5ff;color:#6b21a8;}
+.sb-vendido{background:#f0fdf4;color:#166534;}
+.pt{display:inline-block;padding:2px 7px;border-radius:4px;font-size:10px;font-weight:600;margin:1px;}
+.pt-amatista{background:#ede9fe;color:#7c3aed;}
+.pt-lp-ars{background:#d1fae5;color:#059669;}
+.pt-lp-usd{background:#e0f2fe;color:#0369a1;}
+.pt-zafiro{background:#dbeafe;color:#1d4ed8;}
+.pt-ap{background:#fef3c7;color:#b45309;}
+.iab{width:28px;height:28px;border-radius:6px;border:1.5px solid var(--gray2);background:var(--gray1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;transition:.2s;}
+.iab:hover{border-color:var(--red);color:var(--red);}
+.iab.wa:hover{border-color:#25d366;color:#25d366;}
+
+/* ADD MODAL */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(10,22,40,.6);backdrop-filter:blur(3px);z-index:300;align-items:center;justify-content:center;}
+.modal-ov.active{display:flex;}
+.modal{background:var(--white);border-radius:18px;padding:28px;width:500px;max-width:95vw;box-shadow:var(--shadow-lg);max-height:90vh;overflow-y:auto;}
+.mtitle{font-family:'DM Serif Display',serif;font-size:20px;color:var(--navy);margin-bottom:16px;}
+.mfgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.mf label{display:block;font-size:11px;font-weight:600;color:var(--gray4);margin-bottom:4px;letter-spacing:.3px;}
+.mf input,.mf select,.mf textarea{width:100%;padding:8px 11px;border:1.5px solid var(--gray2);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:13px;color:var(--text);background:var(--gray1);outline:none;transition:.2s;}
+.mf input:focus,.mf select:focus,.mf textarea:focus{border-color:var(--blue-light);background:var(--white);}
+.mf textarea{resize:vertical;min-height:55px;}
+.pchk-row{display:flex;flex-wrap:wrap;gap:6px;margin-top:3px;}
+.pchk{padding:5px 11px;border-radius:14px;border:1.5px solid var(--gray2);font-size:11px;font-weight:600;cursor:pointer;transition:.2s;user-select:none;}
+.pchk.pa{background:#7c3aed;color:#fff;border-color:#7c3aed;}
+.pchk.plars{background:#059669;color:#fff;border-color:#059669;}
+.pchk.plusd{background:#0369a1;color:#fff;border-color:#0369a1;}
+.pchk.pz{background:#1d4ed8;color:#fff;border-color:#1d4ed8;}
+.pchk.pap{background:#b45309;color:#fff;border-color:#b45309;}
+.mactions{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;}
+.btn-cancel{padding:9px 18px;border-radius:9px;border:1.5px solid var(--gray2);background:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--gray4);cursor:pointer;}
+.btn-save{padding:9px 20px;border-radius:9px;background:var(--blue);color:#fff;border:none;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;cursor:pointer;}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 30px;color:var(--gray3);}
+.empty .ei{font-size:44px;margin-bottom:12px;}
+.empty .et{font-size:18px;font-weight:600;color:var(--navy);font-family:'DM Serif Display',serif;margin-bottom:6px;}
+.empty .es{font-size:13px;}
+
+/* LOADING */
+.loading-ov{display:none;position:fixed;inset:0;background:rgba(10,22,40,.5);backdrop-filter:blur(3px);z-index:200;align-items:center;justify-content:center;flex-direction:column;gap:16px;}
+.loading-ov.active{display:flex;}
+.spinner{width:48px;height:48px;border:3px solid rgba(255,255,255,.15);border-top-color:var(--teal);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.ltxt{font-size:14px;color:rgba(255,255,255,.85);font-weight:500;}
+.lstep{font-size:11px;color:rgba(255,255,255,.45);}
+
+/* TOAST */
+.toast{position:fixed;bottom:18px;right:18px;background:var(--navy);color:#fff;padding:11px 16px;border-radius:10px;font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);transform:translateY(60px);opacity:0;transition:.3s cubic-bezier(.34,1.56,.64,1);z-index:500;display:flex;align-items:center;gap:7px;max-width:300px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{border-left:3px solid var(--teal);}
+.toast.error{border-left:3px solid var(--red);}
+.toast.info{border-left:3px solid var(--blue-light);}
+
+@media(max-width:800px){
+  .layout{grid-template-columns:1fr;}
+  .sidebar{position:relative;max-height:none;}
+  .stats-bar{grid-template-columns:repeat(3,1fr);}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="hbrand">
+    <div class="hlogo">🎯</div>
+    <div>
+      <div class="htitle">Pro<span>Salud</span></div>
+      <div class="hsub">Swiss Medical · División Vida</div>
+    </div>
+  </div>
+  <div class="hright">
+    <div class="asesor-pill" id="asesorPill" onclick="cambiarAsesor()">—</div>
+    <div style="display:flex;align-items:center;gap:6px;background:rgba(0,201,177,.15);border:1px solid rgba(0,201,177,.3);border-radius:8px;padding:6px 12px;font-size:11px;color:var(--teal);">
+      <div style="width:7px;height:7px;border-radius:50%;background:var(--teal);flex-shrink:0;"></div>
+      <span>Google Maps activo</span>
+    </div>
+    <a href="gerencial-pipeline.html" style="text-decoration:none"><button class="hbtn">📊 Gerencial</button></a>
+  </div>
+</header>
+
+<!-- SELECCIÓN ASESOR -->
+<div class="select-screen" id="selectScreen">
+  <div class="select-card">
+    <div class="sel-icon">👤</div>
+    <div class="sel-title">¿Quién sos?</div>
+    <div class="sel-sub">Seleccioná tu nombre para acceder a tu panel</div>
+    <div class="asesor-grid" id="asesorGrid"></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="appDiv">
+  <div class="layout">
+
+    <!-- SIDEBAR BÚSQUEDA -->
+    <aside class="sidebar">
+      <div>
+        <div class="slabel">Buscar profesionales</div>
+        <div class="fld">
+          <label>Localidad o zona</label>
+          <input type="text" id="inputLoc" placeholder="Palermo, Rosario, Córdoba..." />
+        </div>
+      </div>
+
+      <div>
+        <div class="slabel">Especialidades</div>
+        <div class="spec-grid">
+          <div class="spec-chip active" data-s="medico" onclick="toggleSpec(this)"><span>🩺</span>Médicos</div>
+          <div class="spec-chip active" data-s="odontologo" onclick="toggleSpec(this)"><span>🦷</span>Odontólogos</div>
+          <div class="spec-chip active" data-s="kinesiologo" onclick="toggleSpec(this)"><span>💪</span>Kinesiólogos</div>
+          <div class="spec-chip active" data-s="psicologo" onclick="toggleSpec(this)"><span>🧠</span>Psicólogos</div>
+          <div class="spec-chip" data-s="nutricionista" onclick="toggleSpec(this)"><span>🥗</span>Nutricionistas</div>
+          <div class="spec-chip" data-s="clinica" onclick="toggleSpec(this)"><span>🏥</span>Clínicas</div>
+          <div class="spec-chip" data-s="farmacia" onclick="toggleSpec(this)"><span>💊</span>Farmacias</div>
+          <div class="spec-chip" data-s="laboratorio" onclick="toggleSpec(this)"><span>🔬</span>Laboratorios</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="slabel">Producto objetivo</div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;">
+          <div class="pchk pa" data-p="amatista" onclick="toggleProd(this)">Amatista</div>
+          <div class="pchk plars" data-p="lp-ars" onclick="toggleProd(this)">LP ARS</div>
+          <div class="pchk plusd" data-p="lp-usd" onclick="toggleProd(this)">LP USD</div>
+          <div class="pchk pz" data-p="zafiro" onclick="toggleProd(this)">Zafiro</div>
+          <div class="pchk pap" data-p="ap" onclick="toggleProd(this)">AP</div>
+        </div>
+      </div>
+
+      <div>
+        <div class="slabel">Radio de búsqueda</div>
+        <div class="fld">
+          <select id="inputRadius">
+            <option value="1000">1 km</option>
+            <option value="2000" selected>2 km</option>
+            <option value="5000">5 km</option>
+            <option value="10000">10 km</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn-buscar" onclick="buscar()">🔍 Buscar profesionales</button>
+    </aside>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <!-- TABS -->
+      <div class="vtabs">
+        <div class="vtab active" onclick="switchVista('busqueda',this)">🔍 Resultados</div>
+        <div class="vtab" onclick="switchVista('pipeline',this)">📋 Mi pipeline <span id="pipeCount" style="background:var(--teal);color:#fff;border-radius:8px;padding:1px 7px;font-size:10px;margin-left:4px;">0</span></div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-bar" id="statsBar">
+        <div class="sbox s0"><div class="sbox-num" id="st0">0</div><div class="sbox-lbl">Prospectos</div></div>
+        <div class="sbox s1"><div class="sbox-num" id="st1">0</div><div class="sbox-lbl">Contactados</div><div class="sbox-pct" id="sp1">—</div></div>
+        <div class="sbox s2"><div class="sbox-num" id="st2">0</div><div class="sbox-lbl">Reuniones</div><div class="sbox-pct" id="sp2">—</div></div>
+        <div class="sbox s3"><div class="sbox-num" id="st3">0</div><div class="sbox-lbl">Cotizados</div><div class="sbox-pct" id="sp3">—</div></div>
+        <div class="sbox s4"><div class="sbox-num" id="st4">0</div><div class="sbox-lbl">Vendidos ✅</div><div class="sbox-pct" id="sp4">—</div></div>
+      </div>
+
+      <!-- VISTA BÚSQUEDA -->
+      <div id="v-busqueda">
+        <div class="results-header">
+          <div><div class="results-title" id="rTitle">Ingresá una localidad para buscar</div>
+          <div class="results-sub" id="rSub">Seleccioná especialidades y hacé click en Buscar</div></div>
+        </div>
+        <div class="cards-grid" id="cardsGrid">
+          <div class="empty" style="grid-column:1/-1">
+            <div class="ei">🏥</div>
+            <div class="et">Buscá tu zona</div>
+            <div class="es">Escribí una localidad, elegí especialidades<br>y presioná Buscar profesionales</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VISTA PIPELINE -->
+      <div id="v-pipeline" style="display:none;">
+        <div class="pipe-toolbar">
+          <div class="pipe-filters">
+            <div class="fpill active" data-f="all" onclick="setFPill(this)">Todos</div>
+            <div class="fpill" data-f="pendiente" onclick="setFPill(this)">Pendiente</div>
+            <div class="fpill" data-f="contactado" onclick="setFPill(this)">Contactado</div>
+            <div class="fpill" data-f="reunion" onclick="setFPill(this)">Reunión</div>
+            <div class="fpill" data-f="cotizado" onclick="setFPill(this)">Cotizado</div>
+            <div class="fpill" data-f="vendido" onclick="setFPill(this)">Vendido ✅</div>
+          </div>
+          <div class="pipe-right">
+            <button class="bsm" onclick="exportCSV()">📥 CSV</button>
+            <button class="bsm primary" onclick="openManual()">+ Agregar manual</button>
+          </div>
+        </div>
+        <div class="ptable-wrap">
+          <table><thead><tr>
+            <th>Nombre</th><th>Especialidad</th><th>Teléfono</th>
+            <th>Producto</th><th>Estado</th><th>Nota</th><th></th>
+          </tr></thead>
+          <tbody id="ptbody"></tbody></table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL AGREGAR MANUAL / DESDE BÚSQUEDA -->
+<div class="modal-ov" id="addModal">
+  <div class="modal">
+    <div class="mtitle" id="mTitle">➕ Agregar al pipeline</div>
+    <div class="mfgrid">
+      <div class="mf"><label>Nombre *</label><input type="text" id="mNombre"/></div>
+      <div class="mf"><label>Especialidad</label>
+        <select id="mEspec">
+          <option>🩺 Médico/a</option><option>🦷 Odontólogo/a</option>
+          <option>💪 Kinesiólogo/a</option><option>🧠 Psicólogo/a</option>
+          <option>🥗 Nutricionista</option><option>💊 Farmacia</option>
+          <option>🏥 Clínica</option><option>🔹 Otro</option>
+        </select>
+      </div>
+      <div class="mf"><label>Teléfono</label><input type="text" id="mTel" placeholder="11-XXXX-XXXX"/></div>
+      <div class="mf"><label>Email</label><input type="text" id="mEmail" placeholder="doctor@mail.com"/></div>
+      <div class="mf" style="grid-column:1/-1"><label>Dirección</label><input type="text" id="mDir"/></div>
+      <div class="mf" style="grid-column:1/-1">
+        <label>Producto/s objetivo</label>
+        <div class="pchk-row">
+          <div class="pchk" data-p="amatista" onclick="toggleMProd(this)" style="color:#7c3aed;border-color:#ddd6fe">Amatista</div>
+          <div class="pchk" data-p="lp-ars" onclick="toggleMProd(this)" style="color:#059669;border-color:#a7f3d0">LP ARS</div>
+          <div class="pchk" data-p="lp-usd" onclick="toggleMProd(this)" style="color:#0369a1;border-color:#bae6fd">LP USD</div>
+          <div class="pchk" data-p="zafiro" onclick="toggleMProd(this)" style="color:#1d4ed8;border-color:#bfdbfe">Zafiro</div>
+          <div class="pchk" data-p="ap" onclick="toggleMProd(this)" style="color:#b45309;border-color:#fde68a">AP</div>
+        </div>
+      </div>
+      <div class="mf"><label>Estado</label>
+        <select id="mEstado">
+          <option value="pendiente">🔵 Pendiente</option>
+          <option value="contactado">🟡 Contactado</option>
+          <option value="reunion">🟠 Reunión pautada</option>
+          <option value="cotizado">🟣 Cotizado</option>
+          <option value="vendido">🟢 Vendido</option>
+        </select>
+      </div>
+      <div class="mf"><label>Prima estimada ($)</label><input type="number" id="mPrima" placeholder="0"/></div>
+      <div class="mf" style="grid-column:1/-1"><label>Nota</label><textarea id="mNota" placeholder="Próximo paso, observaciones..."></textarea></div>
+    </div>
+    <div class="mactions">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveModal()">Guardar en pipeline</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL API KEY -->
+<div class="modal-ov" id="apiModal">
+  <div class="modal" style="max-width:460px">
+    <div class="mtitle">🔑 Google Maps API Key</div>
+    <p style="font-size:13px;color:var(--gray4);margin-bottom:16px;line-height:1.6;">
+      Con tu API Key, la búsqueda trae <strong>datos reales</strong>: nombre, teléfono, dirección y rating de profesionales que existen en esa dirección. Sin API Key funciona con datos simulados.
+    </p>
+    <div class="mf" style="margin-bottom:14px;">
+      <label>API Key de Google Maps</label>
+      <input type="text" id="apiKeyInput" placeholder="AIza..."/>
+    </div>
+    <div style="background:rgba(0,201,177,.07);border:1px solid rgba(0,201,177,.2);border-radius:10px;padding:12px 14px;font-size:12px;color:var(--teal-dark);line-height:1.7;margin-bottom:6px;">
+      📌 <strong>Cómo obtenerla gratis:</strong><br>
+      1. <a href="https://console.cloud.google.com" target="_blank" style="color:var(--blue);font-weight:600">console.cloud.google.com</a><br>
+      2. Crear proyecto → Habilitar <strong>Places API</strong> y <strong>Geocoding API</strong><br>
+      3. Credenciales → Crear clave de API → Pegar acá<br>
+      💡 $200 USD/mes de crédito gratuito = miles de búsquedas
+    </div>
+    <div class="mactions">
+      <button class="btn-cancel" onclick="closeApiModal()">Cancelar</button>
+      <button class="btn-save" onclick="saveApiKey()">Guardar y conectar</button>
+    </div>
+  </div>
+</div>
+
+<div class="loading-ov" id="loadOv">
+  <div class="spinner"></div>
+  <div class="ltxt">Buscando profesionales...</div>
+  <div class="lstep" id="lstep">Generando resultados para tu zona</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════════════
+// CONFIGURACIÓN
+// ══════════════════════════════════════════
+const ASESORES = [
+  'MAGALLANES, MARIA LAURA',
+  'GOMEZ, GEORGINA FERNANDA',
+  'BENITEZ MOMBELLI, LEANDRO EZEQUIEL',
+  'BASTIDAS HERRERA, CLAUDIA CECILIA',
+  'FINOCCHIARO, LAURA LORENA',
+  'CARRASCO, SILVIA GRACIELA',
+  'AVILA, JAVIER ALEJANDRO',
+  'ROSEN, BARBARA DAIANA',
+];
+
+const PROD_LABELS = {'amatista':'Amatista','lp-ars':'LP ARS','lp-usd':'LP USD','zafiro':'Zafiro','ap':'AP'};
+const STATUS_LABELS = {pendiente:'🔵 Pendiente',contactado:'🟡 Contactado',reunion:'🟠 Reunión',cotizado:'🟣 Cotizado',vendido:'🟢 Vendido'};
+
+// ══════════════════════════════════════════
+// BASE DE DATOS SIMULADA POR LOCALIDAD
+// ══════════════════════════════════════════
+const DB = {
+  // ── CABA / AMBA ──
+  palermo: [
+    {nombre:'Dr. Rodrigo Fernández',spec:'medico',label:'Médico/a',icon:'🩺',tel:'011-4823-5500',dir:'Av. Santa Fe 2340, Palermo',rating:4.8,reviews:132},
+    {nombre:'Dra. Valeria Saenz',spec:'medico',label:'Médico/a',icon:'🩺',tel:'011-4821-7723',dir:'Honduras 5540, Palermo',rating:4.6,reviews:88},
+    {nombre:'Dr. Martín Corti',spec:'medico',label:'Médico/a',icon:'🩺',tel:'11-5234-8810',dir:'Gurruchaga 1890, Palermo',rating:4.5,reviews:64},
+    {nombre:'Odontología Integral Rossi',spec:'odontologo',label:'Odontólogo/a',icon:'🦷',tel:'011-4831-4455',dir:'Córdoba 4520, Palermo',rating:4.9,reviews:204},
+    {nombre:'Dra. Beatriz Acuña',spec:'odontologo',label:'Odontólogo/a',icon:'🦷',tel:'011-4773-2255',dir:'Gurruchaga 1465, Palermo',rating:4.7,reviews:96},
+    {nombre:'Centro Kines Palermo',spec:'kinesiologo',label:'Kinesiólogo/a',icon:'💪',tel:'011-4831-0033',dir:'Thames 2100, Palermo',rating:4.4,reviews:55},
+    {nombre:'Lic. Valeria Torres',spec:'psicologo',label:'Psicólogo/a',icon:'🧠',tel:'11-6712-4455',dir:'Thames 1850, Palermo',rating:5.0,reviews:41},
+    {nombre:'Lic. Marcelo Peña',spec:'psicologo',label:'Psicólogo/a',icon:'🧠',tel:'011-4375-8844',dir:'Av. del Libertador 3010, Palermo',rating:4.3,reviews:33},
+    {nombre:'Lic. Ana Godoy',spec:'nutricionista',label:'Nutricionista',icon:'🥗',tel:'11-4822-9910',dir:'Soler 4200, Palermo',rating:4.6,reviews:77},
+  ],
+  recoleta: [
+    {nombre:'Dr. Carlos Méndez',spec:'medico',label:'Médico/a',icon:'🩺',tel:'011-4815-3300',dir:'Av. Callao 1200, Recoleta',rating:4.9,reviews:187},
+    {nombre:'Dra. Lucía Prado',spec:'medico',label:'Médico/a',icon:'🩺',tel:'011-4801-7744',dir:'Juncal 3345, Recoleta',rating:4.7,reviews:142},
+    {nombre:'Clínica Recoleta Norte',spec:'clinica',label:'Clínica',icon:'🏥',tel:'011-4803-1100',dir:'Av. Pueyrredón 1500, Recoleta',rating:4.2,reviews:512},
+    {nombre:'Centro Odontológico Del Pilar',spec:'odontologo',label:'Odontólogo/a',icon:'🦷',tel:'011-4804-6677',dir:'Guido 1850, Recoleta',rating:4.8,reviews:163},
+    {nombre:'Lic. Roberto Sosa',spec:'psicologo',label:'Psicólogo/a',icon:'🧠',tel:'011-4806-2211',dir:'Av. Las Heras 2350, Recoleta',rating:4.5,reviews:59},
+    {nombre:'Instituto Kinésico Recoleta',spec:'kinesiologo',label:'Kinesiólogo/a',icon:'💪',tel:'011-4800-8822',dir:'Riobamba 1100, Recoleta',rating:4.3,reviews:44},
+  ],
+  belgrano: [
+    {nombre:'Dr. Gustavo Romano',spec:'medico',label:'Médico/a',icon:'🩺',tel:'011-4781-9900',dir:'Av. Cabildo 2430, Belgrano',rating:4.6,reviews:167},
+    {nombre:'Dra. Florencia Ibañez',spec:'medico',label:'Médico/a',icon:'🩺',tel:'011-4783-5544',dir:'Virrey del Pino 2100, Belgrano',rating:4.8,reviews:94},
+    {nombre:'Clínica Belgrano Norte',spec:'clinica',label:'Clínica',icon:'🏥',tel:'011-4781-1100',dir:'Virrey del Pino 2800, Belgrano',rating:4.1,reviews:512},
+    {nombre:'Farmacia Del Pueblo Belgrano',spec:'farmacia',label:'Farmacia',icon:'💊',tel:'011-4781-3344',dir:'Av. Cabildo 1200, Belgrano',rating:4.6,reviews:289},
+    {nombre:'Lic. Ana Costello',spec:'psicologo',label:'Psicólogo/a',icon:'🧠',tel:'11-5823-7722',dir:'Vuelta de Obligado 1750, Belgrano',rating:4.9,reviews:62},
+    {nombre:'Centro Odonto Belgrano',spec:'odontologo',label:'Odontólogo/a',icon:'🦷',tel:'011-4786-4411',dir:'Av. Monroe 3500, Belgrano',rating:4.5,reviews:88},
+  ],
+  caballito: [
+    {nombre:'Dr. Hernán Vidal',spec:'medico',label:'Médico/a',icon:'🩺',tel:'011-4901-2233',dir:'Av. Rivadavia 5100, Caballito',rating:4.5,reviews:110},
+    {nombre:'Dra. Sandra Mitre',spec:'medico',label:'Médico/a',icon:'🩺',tel:'011-4903-7788',dir:'Rojas 450, Caballito',rating:4.7,reviews:76},
+    {nombre:'Centro Kinésico del Sur',spec:'kinesiologo',label:'Kinesiólogo/a',icon:'💪',tel:'011-4924-6610',dir:'Av. La Plata 320, Caballito',rating:4.4,reviews:78},
+    {nombre:'Lic. Claudia Soria',spec:'psicologo',label:'Psicólogo/a',icon:'🧠',tel:'011-4901-5544',dir:'Av. Gaona 1400, Caballito',rating:4.6,reviews:52},
+    {nombre:'Odontología Caballito',spec:'odontologo',label:'Odontólogo/a',icon:'🦷',tel:'011-4902-8811',dir:'Pedro Goyena 700, Caballito',rating:4.3,reviews:67},
+  ],
+  // ── INTERIOR ──
+  rosario: [
+    {nombre:'Dr. Pablo Acosta',spec:'medico',label:'Médico/a',icon:'🩺',tel:'0341-421-5500',dir:'Bv. Oroño 1200, Rosario',rating:4.8,reviews:143},
+    {nombre:'Dra. Miriam Longo',spec:'medico',label:'Médico/a',icon:'🩺',tel:'0341-448-3322',dir:'Av. Pellegrini 890, Rosario',rating:4.6,reviews:98},
+    {nombre:'Dr. Jorge Bianchi',spec:'medico',label:'Médico/a',icon:'🩺',tel:'0341-420-7744',dir:'Córdoba 2340, Rosario',rating:4.4,reviews:67},
+    {nombre:'Centro Odontológico Rosario',spec:'odontologo',label:'Odontólogo/a',icon:'🦷',tel:'0341-424-9900',dir:'San Martín 1550, Rosario',rating:4.7,reviews:189},
+    {nombre:'Lic. Natalia Fuentes',spec:'psicologo',label:'Psicólogo/a',icon:'🧠',tel:'0341-460-2211',dir:'Maipú 780, Rosario',rating:4.9,reviews:54},
+    {nombre:'Kines Rosario Centro',spec:'kinesiologo',label:'Kinesiólogo/a',icon:'💪',tel:'0341-425-8833',dir:'Laprida 1200, Rosario',rating:4.3,reviews:41},
+    {nombre:'Instituto Médico del Rosario',spec:'clinica',label:'Clínica',icon:'🏥',tel:'0341-450-1100',dir:'Bv. 27 de Febrero 3850, Rosario',rating:4.0,reviews:678},
+    {nombre:'Farmacia Del Centro Rosario',spec:'farmacia',label:'Farmacia',icon:'💊',tel:'0341-422-4455',dir:'Córdoba 1100, Rosario',rating:4.5,reviews:210},
+  ],
+  córdoba: [
+    {nombre:'Dr. Federico Morales',spec:'medico',label:'Médico/a',icon:'🩺',tel:'0351-422-3300',dir:'Av. Hipólito Yrigoyen 340, Córdoba',rating:4.7,reviews:156},
+    {nombre:'Dra. Graciela Torres',spec:'medico',label:'Médico/a',icon:'🩺',tel:'0351-468-7722',dir:'Bv. San Juan 580, Córdoba',rating:4.9,reviews:89},
+    {nombre:'Dr. Sebastián Díaz',spec:'medico',label:'Médico/a',icon:'🩺',tel:'0351-423-5544',dir:'Duarte Quirós 1450, Córdoba',rating:4.5,reviews:71},
+    {nombre:'Odontología Nueva Córdoba',spec:'odontologo',label:'Odontólogo/a',icon:'🦷',tel:'0351-460-1122',dir:'Obispo Trejo 890, Córdoba',rating:4.6,reviews:134},
+    {nombre:'Centro Kinésico Córdoba',spec:'kinesiologo',label:'Kinesiólogo/a',icon:'💪',tel:'0351-425-9988',dir:'Lima 340, Córdoba',rating:4.4,reviews:63},
+    {nombre:'Lic. Romina Suárez',spec:'psicologo',label:'Psicólogo/a',icon:'🧠',tel:'0351-470-3311',dir:'Av. Colón 2100, Córdoba',rating:4.8,reviews:47},
+    {nombre:'Sanatorio Allende',spec:'clinica',label:'Clínica',icon:'🏥',tel:'0351-426-9200',dir:'Av. Hipólito Yrigoyen 384, Córdoba',rating:4.3,reviews:892},
+  ],
+  mendoza: [
+    {nombre:'Dr. Andrés Quiroga',spec:'medico',label:'Médico/a',icon:'🩺',tel:'0261-420-5500',dir:'Av. San Martín 1250, Mendoza',rating:4.8,reviews:122},
+    {nombre:'Dra. Patricia Rivas',spec:'medico',label:'Médico/a',icon:'🩺',tel:'0261-438-7744',dir:'Belgrano 450, Mendoza',rating:4.6,reviews:87},
+    {nombre:'Centro Odonto Mendoza',spec:'odontologo',label:'Odontólogo/a',icon:'🦷',tel:'0261-425-3344',dir:'Av. Las Heras 680, Mendoza',rating:4.7,reviews:143},
+    {nombre:'Lic. Sofía Rueda',spec:'psicologo',label:'Psicólogo/a',icon:'🧠',tel:'0261-429-1122',dir:'Perú 890, Mendoza',rating:4.9,reviews:48},
+    {nombre:'Kines Mendoza Centro',spec:'kinesiologo',label:'Kinesiólogo/a',icon:'💪',tel:'0261-430-8833',dir:'Sarmiento 1100, Mendoza',rating:4.3,reviews:56},
+    {nombre:'Clínica Santa María Mendoza',spec:'clinica',label:'Clínica',icon:'🏥',tel:'0261-411-1100',dir:'Av. Pedro Molina 3050, Mendoza',rating:4.1,reviews:445},
+  ],
+  neuquén: [
+    {nombre:'Dr. Rodrigo Saavedra',spec:'medico',label:'Médico/a',icon:'🩺',tel:'0299-442-3300',dir:'Av. Argentina 560, Neuquén',rating:4.7,reviews:88},
+    {nombre:'Dra. Cecilia Núñez',spec:'medico',label:'Médico/a',icon:'🩺',tel:'0299-448-5544',dir:'Av. Olascoaga 1200, Neuquén',rating:4.5,reviews:64},
+    {nombre:'Centro Odontológico Neuquén',spec:'odontologo',label:'Odontólogo/a',icon:'🦷',tel:'0299-443-7788',dir:'Mitre 450, Neuquén',rating:4.6,reviews:112},
+    {nombre:'Lic. Daniela Ponce',spec:'psicologo',label:'Psicólogo/a',icon:'🧠',tel:'0299-447-2211',dir:'Av. Independencia 890, Neuquén',rating:4.8,reviews:39},
+    {nombre:'Kines Neuquén',spec:'kinesiologo',label:'Kinesiólogo/a',icon:'💪',tel:'0299-444-9900',dir:'Roca 1340, Neuquén',rating:4.2,reviews:44},
+  ],
+  salta: [
+    {nombre:'Dr. Matías Arias',spec:'medico',label:'Médico/a',icon:'🩺',tel:'0387-431-5500',dir:'Av. Entre Ríos 450, Salta',rating:4.7,reviews:96},
+    {nombre:'Dra. Carolina Molina',spec:'medico',label:'Médico/a',icon:'🩺',tel:'0387-422-7744',dir:'Caseros 880, Salta',rating:4.9,reviews:71},
+    {nombre:'Centro Odonto Salta',spec:'odontologo',label:'Odontólogo/a',icon:'🦷',tel:'0387-431-3344',dir:'Florida 1200, Salta',rating:4.5,reviews:88},
+    {nombre:'Lic. Verónica Juárez',spec:'psicologo',label:'Psicólogo/a',icon:'🧠',tel:'0387-425-1122',dir:'San Martín 670, Salta',rating:4.7,reviews:43},
+    {nombre:'Clínica San Bernardo Salta',spec:'clinica',label:'Clínica',icon:'🏥',tel:'0387-432-1100',dir:'Av. Tavella 1800, Salta',rating:4.0,reviews:334},
+  ],
+  tucumán: [
+    {nombre:'Dr. Diego Álvarez',spec:'medico',label:'Médico/a',icon:'🩺',tel:'0381-422-4400',dir:'Av. Alem 550, Tucumán',rating:4.6,reviews:108},
+    {nombre:'Dra. Laura Villanueva',spec:'medico',label:'Médico/a',icon:'🩺',tel:'0381-430-8833',dir:'San Martín 890, Tucumán',rating:4.8,reviews:82},
+    {nombre:'Centro Kinésico Tucumán',spec:'kinesiologo',label:'Kinesiólogo/a',icon:'💪',tel:'0381-425-6677',dir:'Muñecas 1340, Tucumán',rating:4.3,reviews:51},
+    {nombre:'Odontología Tucumán Centro',spec:'odontologo',label:'Odontólogo/a',icon:'🦷',tel:'0381-421-9900',dir:'Congreso 780, Tucumán',rating:4.5,reviews:97},
+  ],
+};
+
+// ══════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════
+let currentAsesor = null;
+let searchResults = [];
+let piFilter = 'all';
+let modalFromSearch = null;
+
+// ══════════════════════════════════════════
+// STORAGE
+// ══════════════════════════════════════════
+function skey(a){ return 'ps2_' + a.replace(/[^a-z0-9]/gi,'_'); }
+function getData(){ try{ return JSON.parse(localStorage.getItem(skey(currentAsesor)))||[]; }catch(e){return[];} }
+function saveData(d){
+  localStorage.setItem(skey(currentAsesor), JSON.stringify(d));
+  syncGerencial();
+}
+function syncGerencial(){
+  const all={};
+  ASESORES.forEach(a=>{ try{ all[a]=JSON.parse(localStorage.getItem(skey(a)))||[]; }catch(e){ all[a]=[]; } });
+  localStorage.setItem('ps_gerencial_all', JSON.stringify(all));
+}
+function inPipeline(nombre){ return getData().some(p=>p.nombre===nombre); }
+
+// ══════════════════════════════════════════
+// ASESOR SELECT
+// ══════════════════════════════════════════
+function formatName(raw){
+  const p=raw.split(','); if(p.length<2) return raw;
+  return p[1].trim().split(' ')[0]+' '+p[0].trim();
+}
+function buildSelect(){
+  document.getElementById('asesorGrid').innerHTML = ASESORES.map(a=>{
+    const ini=a.split(',')[0].trim().substring(0,2);
+    const cnt=(()=>{ try{return JSON.parse(localStorage.getItem(skey(a))).length;}catch(e){return 0;} })();
+    return `<div class="asesor-btn" onclick="selectAsesor('${a}')">
+      <div class="av">${ini}</div>
+      <div style="flex:1">${formatName(a)}</div>
+      <div class="av-count">${cnt} en pipeline</div>
+    </div>`;
+  }).join('');
+}
+function selectAsesor(a){
+  currentAsesor = a;
+  document.getElementById('selectScreen').style.display='none';
+  document.getElementById('appDiv').style.display='block';
+  document.getElementById('asesorPill').textContent = formatName(a);
+  updatePipeCount();
+  updateStats();
+}
+function cambiarAsesor(){
+  document.getElementById('selectScreen').style.display='flex';
+  document.getElementById('appDiv').style.display='none';
+  buildSelect();
+}
+
+// ══════════════════════════════════════════
+// BÚSQUEDA SIMULADA
+// ══════════════════════════════════════════
+function normalizeKey(str){
+  return str.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]/g,'');
+}
+
+// ══════════════════════════════════════════
+// API KEY GOOGLE
+// ══════════════════════════════════════════
+let GOOGLE_API_KEY = 'AIzaSyAzu02e8BFb7nwZutBNH7cg6b2VfoqqLoI'; // hardcoded
+
+function openApiModal(){
+  const m = document.getElementById('apiModal');
+  const i = document.getElementById('apiKeyInput');
+  if(i) i.value = GOOGLE_API_KEY;
+  if(m) m.classList.add('active');
+}
+function closeApiModal(){
+  const m = document.getElementById('apiModal');
+  if(m) m.classList.remove('active');
+}
+function saveApiKey(){
+  const k = document.getElementById('apiKeyInput').value.trim();
+  if(!k){ showToast('Ingresá una key válida','error'); return; }
+  GOOGLE_API_KEY = k;
+  localStorage.setItem('prosalud_gmaps_key', k);
+  updateApiStatus(true);
+  closeApiModal();
+  showToast('✅ API Key conectada — próxima búsqueda usa datos reales','success');
+}
+function updateApiStatus(connected){
+  const dot = document.getElementById('apiDot');
+  const txt = document.getElementById('apiStatusTxt');
+  if(dot) dot.style.background = connected ? 'var(--teal)' : 'var(--gold)';
+  if(txt) txt.textContent = connected ? 'Google conectado' : 'Conectar Google Maps';
+}
+
+// ══════════════════════════════════════════
+// SPEC MAP PARA GOOGLE PLACES
+// ══════════════════════════════════════════
+const GMAP_TYPE = {
+  medico:'doctor', odontologo:'dentist', kinesiologo:'physiotherapist',
+  psicologo:'psychologist', nutricionista:'health', clinica:'hospital',
+  farmacia:'pharmacy', laboratorio:'medical_lab'
+};
+
+function buscar(){
+  const loc = document.getElementById('inputLoc').value.trim();
+  if(!loc){ showToast('Ingresá una localidad','error'); return; }
+  const specs = [...document.querySelectorAll('.spec-chip.active')].map(el=>el.dataset.s);
+  if(!specs.length){ showToast('Seleccioná al menos una especialidad','error'); return; }
+  const prods = [...document.querySelectorAll('.sidebar .pchk')].filter(el=>
+    el.classList.contains('pa')||el.classList.contains('plars')||
+    el.classList.contains('plusd')||el.classList.contains('pz')||el.classList.contains('pap')
+  ).map(el=>el.dataset.p);
+
+  if(GOOGLE_API_KEY){
+    buscarConGoogle(loc, specs, prods);
+  } else {
+    buscarSimulado(loc, specs, prods);
+  }
+}
+
+// ── BÚSQUEDA REAL CON GOOGLE ──
+async function buscarConGoogle(loc, specs, prods){
+  document.getElementById('loadOv').classList.add('active');
+  document.getElementById('lstep').textContent = 'Geocodificando ubicación...';
+  try {
+    // 1. Geocode
+    const geoRes = await fetch(
+      `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(loc+', Argentina')}&key=${GOOGLE_API_KEY}`
+    );
+    const geoData = await geoRes.json();
+    if(geoData.status !== 'OK' || !geoData.results.length){
+      document.getElementById('loadOv').classList.remove('active');
+      showToast('No se encontró la ubicación en Google. Verificá la API Key.','error');
+      return;
+    }
+    const {lat, lng} = geoData.results[0].geometry.location;
+    const radius = document.getElementById('inputRadius').value;
+    let allResults = [];
+
+    for(const spec of specs){
+      document.getElementById('lstep').textContent = `Buscando ${spec}s en Google Maps...`;
+      const type = GMAP_TYPE[spec] || 'health';
+      const placesRes = await fetch(
+        `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=${radius}&type=${type}&language=es&key=${GOOGLE_API_KEY}`
+      );
+      const placesData = await placesRes.json();
+      if(placesData.results){
+        for(const place of placesData.results.slice(0,8)){
+          document.getElementById('lstep').textContent = `Obteniendo detalles de ${place.name}...`;
+          let tel = '—', website = null;
+          try {
+            const detRes = await fetch(
+              `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=formatted_phone_number,website&language=es&key=${GOOGLE_API_KEY}`
+            );
+            const detData = await detRes.json();
+            tel = detData.result?.formatted_phone_number || '—';
+            website = detData.result?.website || null;
+          } catch(e){}
+          const specInfo = {
+            medico:{label:'Médico/a',icon:'🩺'},odontologo:{label:'Odontólogo/a',icon:'🦷'},
+            kinesiologo:{label:'Kinesiólogo/a',icon:'💪'},psicologo:{label:'Psicólogo/a',icon:'🧠'},
+            nutricionista:{label:'Nutricionista',icon:'🥗'},clinica:{label:'Clínica',icon:'🏥'},
+            farmacia:{label:'Farmacia',icon:'💊'},laboratorio:{label:'Laboratorio',icon:'🔬'},
+          }[spec]||{label:spec,icon:'🔹'};
+          allResults.push({
+            nombre: place.name,
+            spec, label: specInfo.label, icon: specInfo.icon,
+            tel, dir: place.vicinity || '—',
+            website,
+            rating: place.rating || null,
+            reviews: place.user_ratings_total || 0,
+            prods: prods.length ? prods : ['amatista','lp-ars'],
+            fuenteReal: true
+          });
+        }
+      }
+    }
+    searchResults = allResults;
+    document.getElementById('loadOv').classList.remove('active');
+    renderCards();
+    document.getElementById('rTitle').textContent = `${allResults.length} profesionales reales en ${loc}`;
+    document.getElementById('rSub').textContent = '📍 Datos reales de Google Maps · ' + specs.map(s=>s).join(', ');
+    switchVista('busqueda', document.querySelector('.vtab'));
+    showToast(`✅ ${allResults.length} resultados reales de Google`,'success');
+  } catch(err){
+    document.getElementById('loadOv').classList.remove('active');
+    showToast('Error con Google Maps. Verificá tu API Key.','error');
+    console.error(err);
+  }
+}
+
+// ── BÚSQUEDA SIMULADA (sin API Key) ──
+function buscarSimulado(loc, specs, prods){
+  document.getElementById('loadOv').classList.add('active');
+  setTimeout(()=>{
+    const key = normalizeKey(loc);
+    let dbKey = Object.keys(DB).find(k => normalizeKey(k) === key);
+    if(!dbKey) dbKey = Object.keys(DB).find(k => key.includes(normalizeKey(k)) || normalizeKey(k).includes(key));
+    let base = dbKey ? DB[dbKey] : [];
+    if(!base.length) base = generarResultadosGenericos(loc, specs);
+    searchResults = base
+      .filter(p => specs.includes(p.spec))
+      .map(p => ({...p, prods: prods.length ? prods : ['amatista','lp-ars']}));
+    document.getElementById('loadOv').classList.remove('active');
+    renderCards();
+    document.getElementById('rTitle').textContent = `${searchResults.length} profesionales en ${loc} (simulado)`;
+    document.getElementById('rSub').textContent = '⚠️ Datos simulados · Conectá Google Maps API para datos reales';
+    switchVista('busqueda', document.querySelector('.vtab'));
+    showToast(`${searchResults.length} resultados (simulados)`,'info');
+  }, 800);
+}
+
+function generarResultadosGenericos(loc, specs){
+  const apellidos = ['García','López','Martínez','Rodríguez','González','Fernández','Pérez','Sánchez','Romero','Torres','Díaz','Álvarez','Ruiz','Morales','Jiménez','Suárez','Medina','Castro','Ortiz','Vargas'];
+  const nombres = ['Carlos','María','Pablo','Laura','Sergio','Alejandra','Diego','Natalia','Martín','Valeria','Federico','Claudia','Gustavo','Patricia','Roberto','Cecilia'];
+  const specData = {
+    medico:{label:'Médico/a',icon:'🩺',prefix:'Dr./Dra.'},
+    odontologo:{label:'Odontólogo/a',icon:'🦷',prefix:'Dr./Dra.'},
+    kinesiologo:{label:'Kinesiólogo/a',icon:'💪',prefix:'Lic.'},
+    psicologo:{label:'Psicólogo/a',icon:'🧠',prefix:'Lic.'},
+    nutricionista:{label:'Nutricionista',icon:'🥗',prefix:'Lic.'},
+    clinica:{label:'Clínica',icon:'🏥',prefix:'Centro'},
+    farmacia:{label:'Farmacia',icon:'💊',prefix:'Farmacia'},
+    laboratorio:{label:'Laboratorio',icon:'🔬',prefix:'Lab.'},
+  };
+  const results = [];
+  specs.forEach(spec=>{
+    const sd = specData[spec];
+    const count = spec==='clinica'||spec==='farmacia' ? 2 : 3;
+    for(let i=0;i<count;i++){
+      const nom = nombres[Math.floor(Math.random()*nombres.length)];
+      const ape = apellidos[Math.floor(Math.random()*apellidos.length)];
+      const num = Math.floor(Math.random()*9000)+1000;
+      const rating = (3.8+Math.random()*1.2).toFixed(1);
+      const rev = Math.floor(Math.random()*150)+20;
+      results.push({
+        nombre: `${sd.prefix} ${nom} ${ape}`,
+        spec, label:sd.label, icon:sd.icon,
+        tel:`(prefijo)${num}-${Math.floor(Math.random()*9000)+1000}`,
+        dir:`Av. Principal ${num}, ${loc}`,
+        rating:parseFloat(rating), reviews:rev
+      });
+    }
+  });
+  return results;
+}
+
+// ══════════════════════════════════════════
+// RENDER CARDS BÚSQUEDA
+// ══════════════════════════════════════════
+function renderCards(){
+  const grid = document.getElementById('cardsGrid');
+  if(!searchResults.length){
+    grid.innerHTML=`<div class="empty" style="grid-column:1/-1">
+      <div class="ei">🔍</div><div class="et">Sin resultados</div>
+      <div class="es">Probá con otra localidad o más especialidades</div>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = searchResults.map(p=>{
+    const inPipe = inPipeline(p.nombre);
+    return `<div class="pcard ${inPipe?'en-pipeline':''}">
+      ${inPipe?'<div class="pipeline-badge">EN PIPELINE</div>':''}
+      <div class="pcard-top">
+        <div class="pcard-icon">${p.icon}</div>
+        <div style="flex:1">
+          <div class="pcard-name">${p.nombre}</div>
+          <div class="pcard-spec">${p.label}</div>
+        </div>
+        <div class="pcard-rating">⭐ ${p.rating}</div>
+      </div>
+      <div class="pcard-info">
+        <div class="pinfo-row"><span class="ico">📍</span>${p.dir}</div>
+        <div class="pinfo-row"><span class="ico">📞</span>${p.tel}</div>
+        <div class="pinfo-row"><span class="ico">👥</span>${p.reviews} reseñas en Google</div>
+      </div>
+      <div class="pcard-footer">
+        <button class="btn-pipeline ${inPipe?'added':''}" onclick="agregarAlPipeline(${JSON.stringify(p).replace(/"/g,'&quot;')})">
+          ${inPipe?'✓ En mi pipeline':'+ Agregar al pipeline'}
+        </button>
+        <button class="btn-wa" onclick="abrirWA('${p.tel.replace(/[^0-9]/g,'')}')">💬</button>
+        <button class="btn-li" onclick="abrirLI('${p.nombre}')">in</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════
+// PIPELINE
+// ══════════════════════════════════════════
+function agregarAlPipeline(p){
+  if(inPipeline(p.nombre)){ showToast('Ya está en tu pipeline','info'); return; }
+  modalFromSearch = p;
+  document.getElementById('mTitle').textContent = '➕ Agregar al pipeline';
+  document.getElementById('mNombre').value = p.nombre;
+  // set especialidad
+  const specMap = {'medico':'🩺 Médico/a','odontologo':'🦷 Odontólogo/a','kinesiologo':'💪 Kinesiólogo/a','psicologo':'🧠 Psicólogo/a','nutricionista':'🥗 Nutricionista','farmacia':'💊 Farmacia','clinica':'🏥 Clínica'};
+  const sel = document.getElementById('mEspec');
+  [...sel.options].forEach((o,i)=>{ if(o.value===specMap[p.spec]||o.text===specMap[p.spec]) sel.selectedIndex=i; });
+  document.getElementById('mTel').value = p.tel||'';
+  document.getElementById('mEmail').value = '';
+  document.getElementById('mDir').value = p.dir||'';
+  document.getElementById('mEstado').value = 'pendiente';
+  document.getElementById('mPrima').value = '';
+  document.getElementById('mNota').value = '';
+  // reset prods y activar los del search
+  document.querySelectorAll('.pchk-row .pchk').forEach(el=>{ el.className='pchk'; el.style.cssText='color:'+el.style.color+';border-color:'+el.style.borderColor; });
+  (p.prods||[]).forEach(pr=>{
+    const el = document.querySelector(`.pchk-row .pchk[data-p="${pr}"]`);
+    if(el) activatePChk(el);
+  });
+  document.getElementById('addModal').classList.add('active');
+}
+
+function openManual(){
+  modalFromSearch = null;
+  document.getElementById('mTitle').textContent = '➕ Agregar prospecto manual';
+  ['mNombre','mTel','mEmail','mDir','mNota'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('mPrima').value='';
+  document.getElementById('mEstado').value='pendiente';
+  document.querySelectorAll('.pchk-row .pchk').forEach(el=>{
+    el.className='pchk';
+  });
+  document.getElementById('addModal').classList.add('active');
+}
+
+function closeModal(){ document.getElementById('addModal').classList.remove('active'); }
+
+function toggleMProd(el){ activatePChk(el); }
+function activatePChk(el){
+  const p = el.dataset.p;
+  const activeClass = {amatista:'pa','lp-ars':'plars','lp-usd':'plusd',zafiro:'pz',ap:'pap'}[p];
+  if(el.classList.contains(activeClass)){ el.className='pchk'; }
+  else { el.className=`pchk ${activeClass}`; }
+}
+
+function saveModal(){
+  const nombre = document.getElementById('mNombre').value.trim();
+  if(!nombre){ showToast('El nombre es obligatorio','error'); return; }
+  const prods = [...document.querySelectorAll('.pchk-row .pchk')].filter(el=>
+    el.classList.contains('pa')||el.classList.contains('plars')||el.classList.contains('plusd')||el.classList.contains('pz')||el.classList.contains('pap')
+  ).map(el=>el.dataset.p);
+
+  const item = {
+    id: Date.now().toString(),
+    nombre,
+    especialidad: document.getElementById('mEspec').value,
+    tel: document.getElementById('mTel').value.trim(),
+    email: document.getElementById('mEmail').value.trim(),
+    dir: document.getElementById('mDir').value.trim(),
+    prods, estado: document.getElementById('mEstado').value,
+    prima: document.getElementById('mPrima').value||'0',
+    nota: document.getElementById('mNota').value.trim(),
+    fechaAlta: new Date().toISOString(),
+  };
+
+  const data = getData();
+  // Evitar duplicados por nombre
+  if(data.some(p=>p.nombre===nombre)){ showToast('Ya existe en el pipeline','info'); closeModal(); return; }
+  data.push(item);
+  saveData(data);
+  closeModal();
+  updatePipeCount();
+  updateStats();
+  renderPipelineTable();
+  renderCards(); // refrescar badges
+  showToast(`✅ ${nombre} agregado al pipeline`,'success');
+}
+
+function renderPipelineTable(){
+  const data = getData();
+  const filtered = data.filter(p => piFilter==='all' || p.estado===piFilter);
+  const tbody = document.getElementById('ptbody');
+
+  if(!filtered.length){
+    tbody.innerHTML=`<tr><td colspan="7" style="padding:48px;text-align:center;color:var(--gray3)"><span style="font-size:32px;display:block;margin-bottom:8px">📋</span>Sin prospectos en esta vista</td></tr>`;
+    return;
+  }
+
+  const waMsg = encodeURIComponent('Hola! Soy asesor de Swiss Medical Vida. Me gustaría contarle sobre soluciones de ahorro para profesionales de la salud. ¿Tiene unos minutos esta semana?');
+
+  tbody.innerHTML = filtered.map(p=>{
+    const tags = (p.prods||[]).map(pr=>`<span class="pt pt-${pr}">${PROD_LABELS[pr]||pr}</span>`).join('');
+    const wa = p.tel ? p.tel.replace(/[^0-9]/g,'') : '';
+    const nota = p.nota ? (p.nota.length>28?p.nota.substring(0,28)+'…':p.nota) : '—';
+    return `<tr>
+      <td class="nm">${p.nombre}</td>
+      <td style="font-size:12px;color:var(--gray4)">${p.especialidad||'—'}</td>
+      <td style="font-size:12px">${p.tel||'—'}</td>
+      <td>${tags||'—'}</td>
+      <td>
+        <select class="ssel" onchange="updateEstado('${p.id}',this.value)">
+          ${['pendiente','contactado','reunion','cotizado','vendido'].map(s=>
+            `<option value="${s}" ${p.estado===s?'selected':''}>${STATUS_LABELS[s]}</option>`
+          ).join('')}
+        </select>
+      </td>
+      <td style="font-size:11px;color:var(--gray4);max-width:140px" title="${p.nota||''}">${nota}</td>
+      <td><div style="display:flex;gap:5px;">
+        ${wa?`<button class="iab wa" onclick="abrirWA('${wa}')">💬</button>`:''}
+        <button class="iab" onclick="eliminar('${p.id}')">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+
+function updateEstado(id, estado){
+  const data = getData();
+  const p = data.find(x=>x.id===id);
+  if(p){ p.estado=estado; saveData(data); updateStats(); }
+  showToast('Estado actualizado','success');
+}
+function eliminar(id){
+  if(!confirm('¿Eliminar este prospecto del pipeline?')) return;
+  const data = getData().filter(p=>p.id!==id);
+  saveData(data);
+  updatePipeCount(); updateStats(); renderPipelineTable(); renderCards();
+  showToast('Eliminado','info');
+}
+
+// ══════════════════════════════════════════
+// STATS
+// ══════════════════════════════════════════
+function updateStats(){
+  const data = getData();
+  const t=data.length, c=data.filter(p=>['contactado','reunion','cotizado','vendido'].includes(p.estado)).length,
+    r=data.filter(p=>['reunion','cotizado','vendido'].includes(p.estado)).length,
+    co=data.filter(p=>['cotizado','vendido'].includes(p.estado)).length,
+    v=data.filter(p=>p.estado==='vendido').length;
+
+  document.getElementById('st0').textContent=t;
+  document.getElementById('st1').textContent=c;
+  document.getElementById('sp1').textContent=t?Math.round(c/t*100)+'%':'—';
+  document.getElementById('st2').textContent=r;
+  document.getElementById('sp2').textContent=c?Math.round(r/c*100)+'% de contactados':'—';
+  document.getElementById('st3').textContent=co;
+  document.getElementById('sp3').textContent=r?Math.round(co/r*100)+'% de reuniones':'—';
+  document.getElementById('st4').textContent=v;
+  document.getElementById('sp4').textContent=t?Math.round(v/t*100)+'% conversión':'—';
+}
+function updatePipeCount(){
+  const cnt = getData().length;
+  document.getElementById('pipeCount').textContent=cnt;
+}
+
+// ══════════════════════════════════════════
+// VISTAS Y FILTROS
+// ══════════════════════════════════════════
+function switchVista(v, el){
+  document.getElementById('v-busqueda').style.display = v==='busqueda'?'block':'none';
+  document.getElementById('v-pipeline').style.display = v==='pipeline'?'block':'none';
+  document.querySelectorAll('.vtab').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.vtab')[v==='busqueda'?0:1].classList.add('active');
+  if(v==='pipeline'){ renderPipelineTable(); }
+}
+function setFPill(el){
+  document.querySelectorAll('.fpill').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active'); piFilter=el.dataset.f;
+  renderPipelineTable();
+}
+function toggleSpec(el){ el.classList.toggle('active'); }
+function toggleProd(el){
+  const map = {amatista:'pa','lp-ars':'plars','lp-usd':'plusd',zafiro:'pz',ap:'pap'};
+  const cls = map[el.dataset.p];
+  if(el.classList.contains(cls)) el.classList.remove(cls);
+  else el.classList.add(cls);
+}
+
+// ══════════════════════════════════════════
+// UTILIDADES
+// ══════════════════════════════════════════
+function abrirWA(num){
+  let clean = num.replace(/^0/,'');
+  if(!clean.startsWith('54')) clean='54'+clean;
+  const msg=encodeURIComponent('Hola! Soy asesor de Swiss Medical Vida. Me gustaría comentarle sobre soluciones de ahorro para profesionales de la salud. ¿Tiene unos minutos?');
+  window.open(`https://wa.me/${clean}?text=${msg}`,'_blank');
+}
+function abrirLI(nombre){
+  window.open(`https://www.linkedin.com/search/results/people/?keywords=${encodeURIComponent(nombre)}`,'_blank');
+}
+function exportCSV(){
+  const data=getData();
+  if(!data.length){ showToast('Sin datos para exportar','error'); return; }
+  const h=['Nombre','Especialidad','Teléfono','Email','Dirección','Productos','Estado','Prima','Nota'];
+  const rows=data.map(p=>[p.nombre,p.especialidad,p.tel,p.email,p.dir,(p.prods||[]).map(x=>PROD_LABELS[x]).join('|'),p.estado,p.prima,p.nota]);
+  const csv=[h,...rows].map(r=>r.map(c=>`"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}));
+  a.download=`Pipeline_${formatName(currentAsesor).replace(/ /g,'_')}.csv`;
+  a.click(); showToast('CSV exportado','success');
+}
+function showToast(msg,type='info'){
+  const t=document.getElementById('toast');
+  const icons={success:'✅',error:'❌',info:'💡'};
+  t.innerHTML=`<span>${icons[type]}</span><span>${msg}</span>`;
+  t.className=`toast ${type} show`;
+  setTimeout(()=>t.classList.remove('show'),3200);
+}
+
+// ENTER en búsqueda
+document.getElementById('inputLoc').addEventListener('keydown',e=>{ if(e.key==='Enter') buscar(); });
+
+// ── INIT ──
+// Detectar asesor por URL param ?asesor=magallanes
+(function(){
+  const params = new URLSearchParams(window.location.search);
+  const param = params.get('asesor');
+  if(param){
+    const match = ASESORES.find(a => {
+      const slug = a.split(',')[0].trim().toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g,'')
+        .replace(/[^a-z0-9]/g,'-');
+      return slug === param.toLowerCase();
+    });
+    if(match){
+      selectAsesor(match);
+      return;
+    }
+  }
+  buildSelect();
+})();
+if(GOOGLE_API_KEY) updateApiStatus(true);
+</script>
+</body>
+</html>

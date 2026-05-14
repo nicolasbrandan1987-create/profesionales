@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProSalud — Panel Gerencial</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#0a1628;--navy2:#0f2044;--blue:#1a4fd6;--blue-light:#2d6ef7;
+    --teal:#00c9b1;--teal-dark:#009e8c;--gold:#f0b429;
+    --red:#e53e3e;--green:#38a169;--orange:#dd6b20;--purple:#7c3aed;
+    --gray1:#f4f6fb;--gray2:#e2e8f0;--gray3:#94a3b8;--gray4:#64748b;
+    --white:#fff;--text:#1e293b;
+    --shadow:0 4px 24px rgba(10,22,40,.12);--shadow-lg:0 8px 40px rgba(10,22,40,.18);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--gray1);color:var(--text);min-height:100vh;}
+
+  /* HEADER */
+  .header{background:var(--navy);padding:0 32px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100;box-shadow:0 2px 16px rgba(0,0,0,.25);}
+  .hbrand{display:flex;align-items:center;gap:10px;}
+  .hlogo{width:34px;height:34px;background:linear-gradient(135deg,var(--teal),var(--blue-light));border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;}
+  .htitle{font-family:'DM Serif Display',serif;font-size:20px;color:#fff;} .htitle span{color:var(--teal);}
+  .hsub{font-size:10px;color:var(--gray3);letter-spacing:1.5px;text-transform:uppercase;}
+  .hright{display:flex;align-items:center;gap:10px;}
+  .btn-header{padding:7px 14px;border-radius:8px;border:1.5px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.8);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;cursor:pointer;transition:.2s;}
+  .btn-header:hover{background:rgba(255,255,255,.1);color:#fff;}
+  .last-update{font-size:11px;color:var(--gray3);}
+
+  /* TABS */
+  .tabs{background:var(--white);border-bottom:1px solid var(--gray2);padding:0 32px;display:flex;gap:4px;}
+  .tab{padding:14px 20px;font-size:13px;font-weight:500;color:var(--gray4);cursor:pointer;border-bottom:2px solid transparent;transition:.2s;}
+  .tab:hover{color:var(--blue);}
+  .tab.active{color:var(--blue);border-bottom-color:var(--blue);font-weight:600;}
+
+  /* CONTENT */
+  .content{padding:28px 32px;max-width:1200px;margin:0 auto;}
+
+  /* KPI ROW */
+  .kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-bottom:28px;}
+  .kpi{background:var(--white);border-radius:14px;padding:18px 20px;box-shadow:var(--shadow);border-left:4px solid transparent;}
+  .kpi.k0{border-left-color:var(--blue-light);}
+  .kpi.k1{border-left-color:var(--gold);}
+  .kpi.k2{border-left-color:var(--orange);}
+  .kpi.k3{border-left-color:var(--purple);}
+  .kpi.k4{border-left-color:var(--green);}
+  .kpi.k5{border-left-color:var(--teal);}
+  .kpi-num{font-family:'DM Serif Display',serif;font-size:30px;color:var(--navy);}
+  .kpi-lbl{font-size:11px;color:var(--gray3);font-weight:500;margin-top:2px;}
+  .kpi-sub{font-size:11px;color:var(--teal-dark);font-weight:600;margin-top:4px;}
+
+  /* SECTION TITLE */
+  .sec-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--navy);margin-bottom:16px;}
+  .sec-sub{font-size:13px;color:var(--gray3);margin-bottom:20px;margin-top:-10px;}
+
+  /* ASESOR CARDS GRID */
+  .asesores-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px;margin-bottom:32px;}
+  .asesor-card{background:var(--white);border-radius:16px;padding:20px;box-shadow:var(--shadow);border:1.5px solid transparent;transition:.2s;cursor:pointer;}
+  .asesor-card:hover{border-color:var(--blue-light);transform:translateY(-2px);box-shadow:var(--shadow-lg);}
+  .ac-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
+  .ac-avatar{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--navy),var(--blue-light));display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;font-weight:700;flex-shrink:0;}
+  .ac-name{font-size:15px;font-weight:600;color:var(--navy);}
+  .ac-sub{font-size:11px;color:var(--gray3);margin-top:1px;}
+  .ac-conv{margin-left:auto;text-align:right;}
+  .ac-conv-num{font-family:'DM Serif Display',serif;font-size:22px;color:var(--green);}
+  .ac-conv-lbl{font-size:10px;color:var(--gray3);}
+
+  /* MINI FUNNEL */
+  .mini-funnel{display:flex;gap:6px;align-items:flex-end;height:52px;margin-bottom:14px;}
+  .mf-bar-wrap{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+  .mf-bar{width:100%;border-radius:4px 4px 0 0;min-height:3px;transition:.3s;}
+  .mf-val{font-size:11px;font-weight:700;color:var(--navy);}
+  .mf-lbl{font-size:9px;color:var(--gray3);text-align:center;}
+
+  /* MINI STATS ROW */
+  .ac-stats{display:flex;gap:8px;}
+  .ac-stat{flex:1;background:var(--gray1);border-radius:9px;padding:8px 10px;text-align:center;}
+  .ac-stat-num{font-size:16px;font-weight:700;color:var(--navy);}
+  .ac-stat-lbl{font-size:9px;color:var(--gray3);font-weight:500;}
+
+  /* RANKING TABLE */
+  .ranking-wrap{background:var(--white);border-radius:16px;box-shadow:var(--shadow);overflow:hidden;margin-bottom:28px;}
+  table{width:100%;border-collapse:collapse;}
+  thead th{padding:12px 16px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gray3);background:var(--gray1);text-align:left;border-bottom:1px solid var(--gray2);}
+  thead th.right{text-align:right;}
+  tbody tr{border-bottom:1px solid var(--gray2);transition:.15s;}
+  tbody tr:last-child{border-bottom:none;}
+  tbody tr:hover{background:rgba(45,110,247,.025);}
+  td{padding:13px 16px;font-size:13px;vertical-align:middle;}
+  td.right{text-align:right;}
+  .rank-num{font-size:11px;font-weight:700;color:var(--gray3);width:24px;text-align:center;}
+  .rank-medal{font-size:18px;text-align:center;}
+  .prog-bar-wrap{width:120px;}
+  .prog-bar-bg{background:var(--gray2);border-radius:4px;height:6px;overflow:hidden;}
+  .prog-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--blue-light),var(--teal));transition:.4s;}
+
+  /* PIPELINE GLOBAL */
+  .pipe-global{background:var(--white);border-radius:16px;padding:24px;box-shadow:var(--shadow);margin-bottom:28px;}
+  .pipe-steps{display:flex;align-items:center;gap:0;}
+  .pipe-step{flex:1;text-align:center;position:relative;}
+  .pipe-step::after{content:'→';position:absolute;right:-12px;top:50%;transform:translateY(-50%);font-size:18px;color:var(--gray3);}
+  .pipe-step:last-child::after{display:none;}
+  .ps-num{font-family:'DM Serif Display',serif;font-size:36px;color:var(--navy);}
+  .ps-lbl{font-size:12px;font-weight:600;color:var(--gray4);margin-top:4px;}
+  .ps-pct{font-size:11px;color:var(--gray3);margin-top:2px;}
+  .ps-dot{width:12px;height:12px;border-radius:50%;margin:0 auto 8px;}
+
+  /* DETAIL MODAL */
+  .modal-ov{display:none;position:fixed;inset:0;background:rgba(10,22,40,.6);backdrop-filter:blur(4px);z-index:300;align-items:center;justify-content:center;}
+  .modal-ov.active{display:flex;}
+  .modal-det{background:var(--white);border-radius:20px;padding:32px;width:780px;max-width:95vw;box-shadow:var(--shadow-lg);max-height:90vh;overflow-y:auto;}
+  .det-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--navy);margin-bottom:4px;}
+  .det-sub{font-size:13px;color:var(--gray3);margin-bottom:20px;}
+  .det-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;}
+  .det-kpi{background:var(--gray1);border-radius:10px;padding:12px 14px;text-align:center;}
+  .det-kpi-num{font-size:22px;font-weight:700;color:var(--navy);}
+  .det-kpi-lbl{font-size:10px;color:var(--gray3);}
+  .btn-close{padding:9px 20px;border-radius:10px;border:1.5px solid var(--gray2);background:var(--white);font-family:'DM Sans',sans-serif;font-size:13px;color:var(--gray4);cursor:pointer;}
+
+  /* STATUS BADGES */
+  .sb{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:10px;font-size:11px;font-weight:600;}
+  .sb-pendiente{background:#eff6ff;color:#1d4ed8;}
+  .sb-contactado{background:#fefce8;color:#854d0e;}
+  .sb-reunion{background:#fff7ed;color:#9a3412;}
+  .sb-cotizado{background:#faf5ff;color:#6b21a8;}
+  .sb-vendido{background:#f0fdf4;color:#166534;}
+
+  /* EMPTY */
+  .empty-box{text-align:center;padding:60px;color:var(--gray3);}
+  .empty-box .ei{font-size:40px;margin-bottom:12px;}
+
+  /* SPECIALTY PIE */
+  .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px;}
+  .chart-box{background:var(--white);border-radius:16px;padding:20px 24px;box-shadow:var(--shadow);}
+  .chart-title{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:16px;}
+  .bar-list{display:flex;flex-direction:column;gap:10px;}
+  .bl-row{display:flex;align-items:center;gap:10px;}
+  .bl-label{font-size:12px;color:var(--gray4);width:110px;flex-shrink:0;}
+  .bl-bar-bg{flex:1;background:var(--gray2);border-radius:4px;height:8px;overflow:hidden;}
+  .bl-bar-fill{height:100%;border-radius:4px;transition:.4s;}
+  .bl-val{font-size:12px;font-weight:600;color:var(--navy);width:28px;text-align:right;}
+
+  .tab-content{display:none;}
+  .tab-content.active{display:block;}
+</style>
+</head>
+<body>
+
+<header class="header">
+  <div class="hbrand">
+    <div class="hlogo">📊</div>
+    <div>
+      <div class="htitle">Pro<span>Salud</span> · Gerencial</div>
+      <div class="hsub">División VIDA · Swiss Medical</div>
+    </div>
+  </div>
+  <div class="hright">
+    <span class="last-update" id="lastUpdate"></span>
+    <button class="btn-header" onclick="loadAll(); showToast('Datos actualizados','success')">🔄 Actualizar</button>
+    <a href="asesor-pipeline.html"><button class="btn-header">👤 Panel asesor</button></a>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('resumen',this)">📋 Resumen</div>
+  <div class="tab" onclick="switchTab('asesores',this)">👥 Por asesor</div>
+  <div class="tab" onclick="switchTab('ranking',this)">🏆 Ranking</div>
+  <div class="tab" onclick="switchTab('especialidades',this)">🔬 Especialidades</div>
+</div>
+
+<div class="content">
+
+  <!-- KPI ROW -->
+  <div class="kpi-row" id="kpiRow"></div>
+
+  <!-- TAB RESUMEN -->
+  <div class="tab-content active" id="tab-resumen">
+    <div class="pipe-global" id="pipeGlobal"></div>
+    <div class="charts-row" id="chartsRow"></div>
+  </div>
+
+  <!-- TAB ASESORES -->
+  <div class="tab-content" id="tab-asesores">
+    <div class="sec-title">Pipeline por asesor</div>
+    <div class="sec-sub">Clickeá en una card para ver el detalle completo</div>
+    <div class="asesores-grid" id="asesoresGrid"></div>
+  </div>
+
+  <!-- TAB RANKING -->
+  <div class="tab-content" id="tab-ranking">
+    <div class="sec-title">Ranking de conversión</div>
+    <div class="sec-sub">Ordenado por % de conversión (prospectos → ventas)</div>
+    <div class="ranking-wrap"><table id="rankingTable"></table></div>
+  </div>
+
+  <!-- TAB ESPECIALIDADES -->
+  <div class="tab-content" id="tab-especialidades">
+    <div class="sec-title">Análisis por especialidad</div>
+    <div class="charts-row" id="specCharts"></div>
+  </div>
+
+</div>
+
+<!-- DETAIL MODAL -->
+<div class="modal-ov" id="detModal">
+  <div class="modal-det" id="detContent"></div>
+</div>
+
+<div class="toast" id="toast" style="position:fixed;bottom:20px;right:20px;background:var(--navy);color:#fff;padding:12px 18px;border-radius:11px;font-size:13px;font-weight:500;box-shadow:var(--shadow-lg);transform:translateY(70px);opacity:0;transition:.3s cubic-bezier(.34,1.56,.64,1);z-index:500;display:flex;align-items:center;gap:8px;"></div>
+
+<script>
+const ASESORES = [
+  'MAGALLANES, MARIA LAURA',
+  'GOMEZ, GEORGINA FERNANDA',
+  'BENITEZ MOMBELLI, LEANDRO EZEQUIEL',
+  'BASTIDAS HERRERA, CLAUDIA CECILIA',
+  'FINOCCHIARO, LAURA LORENA',
+  'CARRASCO, SILVIA GRACIELA',
+  'AVILA, JAVIER ALEJANDRO',
+  'ROSEN, BARBARA DAIANA',
+];
+
+const PROD_LABELS = {'amatista':'Amatista','lp-ars':'LP ARS','lp-usd':'LP USD','zafiro':'Zafiro','ap':'AP'};
+const STATUS_LABELS = {pendiente:'Pendiente',contactado:'Contactado',reunion:'Reunión',cotizado:'Cotizado',vendido:'Vendido'};
+const SPEC_ICONS = {'Médico/a':'🩺','Odontólogo/a':'🦷','Kinesiólogo/a':'💪','Psicólogo/a':'🧠','Nutricionista':'🥗','Farmacia':'💊','Clínica':'🏥','Laboratorio':'🔬','Otro':'🔹'};
+
+let allData = {};
+
+function formatName(raw){
+  const parts = raw.split(',');
+  if(parts.length<2) return raw;
+  return parts[1].trim().split(' ')[0] + ' ' + parts[0].trim();
+}
+function getInitials(raw){
+  return raw.split(',')[0].trim().substring(0,2);
+}
+
+function storageKey(asesor){ return 'ps_pipeline_' + asesor.replace(/[^a-z0-9]/gi,'_'); }
+function loadAll(){
+  allData = {};
+  ASESORES.forEach(a => {
+    try{ allData[a] = JSON.parse(localStorage.getItem(storageKey(a))) || []; }
+    catch(e){ allData[a] = []; }
+  });
+  document.getElementById('lastUpdate').textContent = 'Actualizado: ' + new Date().toLocaleTimeString('es-AR',{hour:'2-digit',minute:'2-digit'});
+  renderAll();
+}
+
+function calcAsesor(asesor){
+  const data = allData[asesor] || [];
+  const total = data.length;
+  let contactado=0,reunion=0,cotizado=0,vendido=0,prima=0;
+  data.forEach(p=>{
+    if(['contactado','reunion','cotizado','vendido'].includes(p.estado)) contactado++;
+    if(['reunion','cotizado','vendido'].includes(p.estado)) reunion++;
+    if(['cotizado','vendido'].includes(p.estado)) cotizado++;
+    if(p.estado==='vendido'){ vendido++; prima+=parseFloat(p.prima||0); }
+  });
+  const conv = total>0 ? Math.round(vendido/total*100) : 0;
+  return {total,contactado,reunion,cotizado,vendido,prima,conv,data};
+}
+
+function calcGlobal(){
+  const g = {total:0,contactado:0,reunion:0,cotizado:0,vendido:0,prima:0};
+  ASESORES.forEach(a=>{
+    const c = calcAsesor(a);
+    g.total+=c.total; g.contactado+=c.contactado; g.reunion+=c.reunion;
+    g.cotizado+=c.cotizado; g.vendido+=c.vendido; g.prima+=c.prima;
+  });
+  g.conv = g.total>0 ? Math.round(g.vendido/g.total*100) : 0;
+  return g;
+}
+
+function renderAll(){
+  const g = calcGlobal();
+  renderKPIs(g);
+  renderPipeGlobal(g);
+  renderCharts();
+  renderAsesoresGrid();
+  renderRanking();
+  renderSpecCharts();
+}
+
+// ── KPIs ──
+function renderKPIs(g){
+  document.getElementById('kpiRow').innerHTML = `
+    <div class="kpi k0"><div class="kpi-num">${g.total}</div><div class="kpi-lbl">Total prospectos</div><div class="kpi-sub">todos los asesores</div></div>
+    <div class="kpi k1"><div class="kpi-num">${g.contactado}</div><div class="kpi-lbl">Contactados</div><div class="kpi-sub">${g.total?Math.round(g.contactado/g.total*100):0}% del total</div></div>
+    <div class="kpi k2"><div class="kpi-num">${g.reunion}</div><div class="kpi-lbl">Reuniones</div><div class="kpi-sub">${g.contactado?Math.round(g.reunion/g.contactado*100):0}% de contactados</div></div>
+    <div class="kpi k3"><div class="kpi-num">${g.cotizado}</div><div class="kpi-lbl">Cotizados</div><div class="kpi-sub">${g.reunion?Math.round(g.cotizado/g.reunion*100):0}% de reuniones</div></div>
+    <div class="kpi k4"><div class="kpi-num">${g.vendido}</div><div class="kpi-lbl">Ventas ✅</div><div class="kpi-sub">$${g.prima.toLocaleString('es-AR')} prima</div></div>
+    <div class="kpi k5"><div class="kpi-num">${g.conv}%</div><div class="kpi-lbl">Conversión global</div><div class="kpi-sub">prospecto → venta</div></div>
+  `;
+}
+
+// ── PIPE GLOBAL ──
+function renderPipeGlobal(g){
+  const steps = [
+    {key:'total',lbl:'Cargados',color:'#2d6ef7',dot:'#2d6ef7'},
+    {key:'contactado',lbl:'Contactados',color:'#f0b429',dot:'#f0b429'},
+    {key:'reunion',lbl:'Reuniones',color:'#dd6b20',dot:'#dd6b20'},
+    {key:'cotizado',lbl:'Cotizados',color:'#7c3aed',dot:'#7c3aed'},
+    {key:'vendido',lbl:'Vendidos',color:'#38a169',dot:'#38a169'},
+  ];
+  const html = `
+    <div style="font-size:12px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--gray3);margin-bottom:20px;">Embudo global — ${ASESORES.length} asesores</div>
+    <div class="pipe-steps">
+      ${steps.map(s => {
+        const prev = s.key==='total' ? g.total : (s.key==='contactado' ? g.total : (s.key==='reunion' ? g.contactado : (s.key==='cotizado' ? g.reunion : g.cotizado)));
+        const pct = prev > 0 ? Math.round(g[s.key]/prev*100) : 0;
+        return `<div class="pipe-step">
+          <div class="ps-dot" style="background:${s.dot}"></div>
+          <div class="ps-num" style="color:${s.color}">${g[s.key]}</div>
+          <div class="ps-lbl">${s.lbl}</div>
+          <div class="ps-pct">${s.key!=='total' ? pct+'% conversión' : '100% base'}</div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  document.getElementById('pipeGlobal').innerHTML = html;
+}
+
+// ── CHARTS ──
+function renderCharts(){
+  // Productos más usados
+  const prodCount = {};
+  ASESORES.forEach(a => {
+    (allData[a]||[]).forEach(p => {
+      (p.prods||[]).forEach(pr => { prodCount[pr] = (prodCount[pr]||0)+1; });
+    });
+  });
+  const total = Object.values(prodCount).reduce((a,b)=>a+b,0)||1;
+  const prodColors = {'amatista':'#7c3aed','lp-ars':'#059669','lp-usd':'#0369a1','zafiro':'#1d4ed8','ap':'#b45309'};
+
+  // Asesor con más prospectos
+  const asByTotal = ASESORES.map(a => ({name:formatName(a), c:calcAsesor(a)}))
+    .sort((a,b)=>b.c.total-a.c.total);
+  const maxT = asByTotal[0]?.c.total||1;
+
+  document.getElementById('chartsRow').innerHTML = `
+    <div class="chart-box">
+      <div class="chart-title">📦 Distribución por producto</div>
+      <div class="bar-list">
+        ${Object.entries(prodCount).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
+          <div class="bl-row">
+            <div class="bl-label">${PROD_LABELS[k]||k}</div>
+            <div class="bl-bar-bg"><div class="bl-bar-fill" style="width:${Math.round(v/total*100)}%;background:${prodColors[k]||'#2d6ef7'}"></div></div>
+            <div class="bl-val">${v}</div>
+          </div>`).join('')}
+        ${!Object.keys(prodCount).length ? '<div style="color:var(--gray3);font-size:13px;text-align:center;padding:20px">Sin datos aún</div>' : ''}
+      </div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">👤 Prospectos por asesor</div>
+      <div class="bar-list">
+        ${asByTotal.map(({name,c})=>`
+          <div class="bl-row">
+            <div class="bl-label" style="font-size:11px;">${name}</div>
+            <div class="bl-bar-bg"><div class="bl-bar-fill" style="width:${Math.round(c.total/maxT*100)}%;background:linear-gradient(90deg,#2d6ef7,#00c9b1)"></div></div>
+            <div class="bl-val">${c.total}</div>
+          </div>`).join('')}
+      </div>
+    </div>`;
+}
+
+// ── ASESORES GRID ──
+function renderAsesoresGrid(){
+  document.getElementById('asesoresGrid').innerHTML = ASESORES.map(a => {
+    const c = calcAsesor(a);
+    const max = Math.max(c.total,1);
+    const bars = [
+      {v:c.total,lbl:'Total',color:'#2d6ef7'},
+      {v:c.contactado,lbl:'Contact.',color:'#f0b429'},
+      {v:c.reunion,lbl:'Reunión',color:'#dd6b20'},
+      {v:c.cotizado,lbl:'Cotiz.',color:'#7c3aed'},
+      {v:c.vendido,lbl:'Vendido',color:'#38a169'},
+    ];
+    return `<div class="asesor-card" onclick="openDetail('${a}')">
+      <div class="ac-header">
+        <div class="ac-avatar">${getInitials(a)}</div>
+        <div>
+          <div class="ac-name">${formatName(a)}</div>
+          <div class="ac-sub">${c.total} prospectos · $${c.prima.toLocaleString('es-AR')} prima</div>
+        </div>
+        <div class="ac-conv">
+          <div class="ac-conv-num">${c.conv}%</div>
+          <div class="ac-conv-lbl">conversión</div>
+        </div>
+      </div>
+      <div class="mini-funnel">
+        ${bars.map(b=>{
+          const h = Math.max(Math.round(b.v/max*44),3);
+          return `<div class="mf-bar-wrap">
+            <div class="mf-val">${b.v}</div>
+            <div class="mf-bar" style="height:${h}px;background:${b.color};border-radius:4px 4px 0 0;"></div>
+            <div class="mf-lbl">${b.lbl}</div>
+          </div>`;
+        }).join('')}
+      </div>
+      <div class="ac-stats">
+        <div class="ac-stat"><div class="ac-stat-num">${c.contactado}</div><div class="ac-stat-lbl">Contactados</div></div>
+        <div class="ac-stat"><div class="ac-stat-num">${c.reunion}</div><div class="ac-stat-lbl">Reuniones</div></div>
+        <div class="ac-stat"><div class="ac-stat-num">${c.cotizado}</div><div class="ac-stat-lbl">Cotizados</div></div>
+        <div class="ac-stat"><div class="ac-stat-num" style="color:var(--green)">${c.vendido}</div><div class="ac-stat-lbl">Vendidos</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── RANKING ──
+function renderRanking(){
+  const medals = ['🥇','🥈','🥉'];
+  const sorted = ASESORES.map(a => ({a, c:calcAsesor(a)})).sort((x,y)=>y.c.conv-x.c.conv);
+  const maxPrima = Math.max(...sorted.map(x=>x.c.prima),1);
+
+  const thead = `<thead><tr>
+    <th style="width:40px"></th>
+    <th>Asesor</th>
+    <th class="right">Prospectos</th>
+    <th class="right">Contactados</th>
+    <th class="right">Reuniones</th>
+    <th class="right">Cotizados</th>
+    <th class="right">Ventas</th>
+    <th>Conversión</th>
+    <th class="right">Prima estimada</th>
+  </tr></thead>`;
+
+  const tbody = sorted.map((x,i)=>`<tr>
+    <td class="rank-medal">${medals[i]||'#'+(i+1)}</td>
+    <td><strong style="font-size:13px;">${formatName(x.a)}</strong></td>
+    <td class="right">${x.c.total}</td>
+    <td class="right">${x.c.contactado}</td>
+    <td class="right">${x.c.reunion}</td>
+    <td class="right">${x.c.cotizado}</td>
+    <td class="right" style="color:var(--green);font-weight:700">${x.c.vendido}</td>
+    <td>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="prog-bar-wrap"><div class="prog-bar-bg"><div class="prog-bar-fill" style="width:${x.c.conv}%"></div></div></div>
+        <span style="font-size:12px;font-weight:700;color:var(--blue)">${x.c.conv}%</span>
+      </div>
+    </td>
+    <td class="right" style="font-weight:600">$${x.c.prima.toLocaleString('es-AR')}</td>
+  </tr>`).join('');
+
+  document.getElementById('rankingTable').innerHTML = thead + '<tbody>' + tbody + '</tbody>';
+}
+
+// ── ESPECIALIDADES ──
+function renderSpecCharts(){
+  const specCount = {}, specVendido = {};
+  ASESORES.forEach(a => {
+    (allData[a]||[]).forEach(p => {
+      const s = p.especialidad || 'Otro';
+      specCount[s] = (specCount[s]||0)+1;
+      if(p.estado==='vendido') specVendido[s] = (specVendido[s]||0)+1;
+    });
+  });
+  const maxC = Math.max(...Object.values(specCount),1);
+
+  const specColorsArr = ['#2d6ef7','#f0b429','#dd6b20','#7c3aed','#38a169','#00c9b1','#e53e3e','#0369a1'];
+  const entries = Object.entries(specCount).sort((a,b)=>b[1]-a[1]);
+
+  document.getElementById('specCharts').innerHTML = `
+    <div class="chart-box">
+      <div class="chart-title">🔬 Prospectos por especialidad</div>
+      <div class="bar-list">
+        ${entries.map(([k,v],i)=>`<div class="bl-row">
+          <div class="bl-label">${SPEC_ICONS[k]||'🔹'} ${k}</div>
+          <div class="bl-bar-bg"><div class="bl-bar-fill" style="width:${Math.round(v/maxC*100)}%;background:${specColorsArr[i%specColorsArr.length]}"></div></div>
+          <div class="bl-val">${v}</div>
+        </div>`).join('')}
+        ${!entries.length ? '<div style="color:var(--gray3);font-size:13px;text-align:center;padding:20px">Sin datos aún</div>' : ''}
+      </div>
+    </div>
+    <div class="chart-box">
+      <div class="chart-title">✅ Ventas por especialidad</div>
+      <div class="bar-list">
+        ${entries.map(([k,v],i) => {
+          const vend = specVendido[k]||0;
+          const conv = v>0 ? Math.round(vend/v*100) : 0;
+          return `<div class="bl-row">
+            <div class="bl-label">${SPEC_ICONS[k]||'🔹'} ${k}</div>
+            <div class="bl-bar-bg"><div class="bl-bar-fill" style="width:${conv}%;background:#38a169"></div></div>
+            <div class="bl-val">${vend}</div>
+          </div>`;
+        }).join('')}
+        ${!entries.length ? '<div style="color:var(--gray3);font-size:13px;text-align:center;padding:20px">Sin datos aún</div>' : ''}
+      </div>
+    </div>`;
+}
+
+// ── DETAIL MODAL ──
+function openDetail(asesor){
+  const c = calcAsesor(asesor);
+  const data = c.data;
+
+  const rows = data.length ? data.map(p => {
+    const tags = (p.prods||[]).map(pr=>`<span style="display:inline-block;padding:2px 7px;border-radius:5px;font-size:10px;font-weight:600;margin:1px;background:#eff6ff;color:#1d4ed8">${PROD_LABELS[pr]||pr}</span>`).join('');
+    return `<tr>
+      <td style="font-size:13px;font-weight:600">${p.nombre}</td>
+      <td style="font-size:12px;color:var(--gray4)">${p.especialidad||'—'}</td>
+      <td>${tags||'—'}</td>
+      <td><span class="sb sb-${p.estado}">${STATUS_LABELS[p.estado]||p.estado}</span></td>
+      <td style="font-size:12px;font-weight:600">$${parseFloat(p.prima||0).toLocaleString('es-AR')}</td>
+    </tr>`;
+  }).join('') : `<tr><td colspan="5" style="padding:32px;text-align:center;color:var(--gray3)">Sin prospectos cargados aún</td></tr>`;
+
+  document.getElementById('detContent').innerHTML = `
+    <div class="det-title">${formatName(asesor)}</div>
+    <div class="det-sub">Pipeline personal · ProSalud</div>
+    <div class="det-kpis">
+      <div class="det-kpi"><div class="det-kpi-num">${c.total}</div><div class="det-kpi-lbl">Total</div></div>
+      <div class="det-kpi"><div class="det-kpi-num">${c.contactado}</div><div class="det-kpi-lbl">Contactados</div></div>
+      <div class="det-kpi"><div class="det-kpi-num">${c.reunion}</div><div class="det-kpi-lbl">Reuniones</div></div>
+      <div class="det-kpi"><div class="det-kpi-num">${c.cotizado}</div><div class="det-kpi-lbl">Cotizados</div></div>
+      <div class="det-kpi"><div class="det-kpi-num" style="color:var(--green)">${c.vendido}</div><div class="det-kpi-lbl">Ventas ✅</div></div>
+    </div>
+    <table style="width:100%;border-collapse:collapse;font-size:13px;">
+      <thead><tr>
+        <th style="text-align:left;padding:10px 12px;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--gray3);background:var(--gray1);border-bottom:1px solid var(--gray2)">Nombre</th>
+        <th style="text-align:left;padding:10px 12px;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--gray3);background:var(--gray1);border-bottom:1px solid var(--gray2)">Especialidad</th>
+        <th style="text-align:left;padding:10px 12px;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--gray3);background:var(--gray1);border-bottom:1px solid var(--gray2)">Producto</th>
+        <th style="text-align:left;padding:10px 12px;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--gray3);background:var(--gray1);border-bottom:1px solid var(--gray2)">Estado</th>
+        <th style="text-align:left;padding:10px 12px;font-size:11px;letter-spacing:.8px;text-transform:uppercase;color:var(--gray3);background:var(--gray1);border-bottom:1px solid var(--gray2)">Prima</th>
+      </tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div style="display:flex;justify-content:flex-end;margin-top:20px;">
+      <button class="btn-close" onclick="closeDetail()">Cerrar</button>
+    </div>`;
+
+  document.getElementById('detModal').classList.add('active');
+}
+function closeDetail(){ document.getElementById('detModal').classList.remove('active'); }
+document.getElementById('detModal').addEventListener('click', e => { if(e.target===document.getElementById('detModal')) closeDetail(); });
+
+// ── TABS ──
+function switchTab(id, el){
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  el.classList.add('active');
+}
+
+// ── TOAST ──
+function showToast(msg,type='info'){
+  const t=document.getElementById('toast');
+  const icons={success:'✅',error:'❌',info:'💡'};
+  t.innerHTML=`<span>${icons[type]}</span><span>${msg}</span>`;
+  t.style.borderLeft=`4px solid ${type==='success'?'var(--teal)':type==='error'?'var(--red)':'var(--blue-light)'}`;
+  t.style.transform='translateY(0)'; t.style.opacity='1';
+  setTimeout(()=>{ t.style.transform='translateY(70px)'; t.style.opacity='0'; }, 3000);
+}
+
+// ── INIT ──
+loadAll();
+setInterval(loadAll, 30000); // auto-refresh cada 30s
+</script>
+</body>
+</html>
