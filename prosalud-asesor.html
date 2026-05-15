@@ -651,81 +651,105 @@ function buscar(){
   }
 }
 
-// ── BÚSQUEDA REAL CON GOOGLE (Text Search via script tag) ──
+// ── BÚSQUEDA REAL CON GOOGLE ──
 async function buscarConGoogle(loc, specs, prods){
   document.getElementById('loadOv').classList.add('active');
-  document.getElementById('lstep').textContent = 'Conectando con Google Maps...';
 
   const specInfo = {
-    medico:{label:'Médico/a',icon:'🩺',kw:'medico doctor clinica'},
-    odontologo:{label:'Odontólogo/a',icon:'🦷',kw:'odontologo dentista odontologia'},
-    kinesiologo:{label:'Kinesiólogo/a',icon:'💪',kw:'kinesiologo fisioterapia kinesiologia'},
-    psicologo:{label:'Psicólogo/a',icon:'🧠',kw:'psicologo psicologia terapeuta'},
-    nutricionista:{label:'Nutricionista',icon:'🥗',kw:'nutricionista nutricion dietista'},
-    clinica:{label:'Clínica',icon:'🏥',kw:'clinica hospital sanatorio'},
-    farmacia:{label:'Farmacia',icon:'💊',kw:'farmacia'},
-    laboratorio:{label:'Laboratorio',icon:'🔬',kw:'laboratorio analisis clinicos'},
+    medico:       {label:'Médico/a',     icon:'🩺', kw:'medico'},
+    odontologo:   {label:'Odontólogo/a', icon:'🦷', kw:'odontologo dentista'},
+    kinesiologo:  {label:'Kinesiólogo/a',icon:'💪', kw:'kinesiologo fisioterapia'},
+    psicologo:    {label:'Psicólogo/a',  icon:'🧠', kw:'psicologo psicologa'},
+    nutricionista:{label:'Nutricionista',icon:'🥗', kw:'nutricionista'},
+    clinica:      {label:'Clínica',      icon:'🏥', kw:'clinica sanatorio'},
+    farmacia:     {label:'Farmacia',     icon:'💊', kw:'farmacia'},
+    laboratorio:  {label:'Laboratorio',  icon:'🔬', kw:'laboratorio analisis'},
   };
 
   try {
-    let allResults = [];
+    // 1. Geocodificar la localidad para obtener lat/lng exactas
+    document.getElementById('lstep').textContent = 'Buscando ubicación...';
+    const geoUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(loc+', Argentina')}&key=${GOOGLE_API_KEY}`;
+    const geoRes = await fetch(geoUrl);
+    const geoData = await geoRes.json();
+
+    if(geoData.status === 'REQUEST_DENIED'){
+      document.getElementById('loadOv').classList.remove('active');
+      showToast('API Key sin permisos — usando datos simulados','info');
+      buscarSimulado(loc, specs, prods);
+      return;
+    }
+
+    if(geoData.status !== 'OK' || !geoData.results.length){
+      document.getElementById('loadOv').classList.remove('active');
+      showToast('No se encontró la ubicación — usando datos simulados','info');
+      buscarSimulado(loc, specs, prods);
+      return;
+    }
+
+    const {lat, lng} = geoData.results[0].geometry.location;
     const radius = document.getElementById('inputRadius').value;
+    let allResults = [];
 
+    // 2. Por cada especialidad: Text Search anclado a lat/lng
     for(const spec of specs){
-      document.getElementById('lstep').textContent = `Buscando ${specInfo[spec]?.label || spec} en ${loc}...`;
-      const query = encodeURIComponent(`${specInfo[spec]?.kw || spec} en ${loc} Argentina`);
-      
-      const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${query}&language=es&region=ar&key=${GOOGLE_API_KEY}`;
-      
-      const res = await fetch(url);
-      const data = await res.json();
-      
-      if(data.status === 'REQUEST_DENIED'){
-        document.getElementById('loadOv').classList.remove('active');
-        // Fallback a simulado con aviso
-        showToast('Google requiere configuración adicional — usando datos simulados','info');
-        buscarSimulado(loc, specs, prods);
-        return;
-      }
+      const si = specInfo[spec] || {label:spec, icon:'🔹', kw:spec};
+      document.getElementById('lstep').textContent = `Buscando ${si.label} en ${loc}...`;
 
-      if(data.results){
-        for(const place of data.results.slice(0, 8)){
-          allResults.push({
-            nombre: place.name,
-            spec, 
-            label: specInfo[spec]?.label || spec, 
-            icon: specInfo[spec]?.icon || '🔹',
-            tel: place.formatted_phone_number || '—',
-            dir: place.formatted_address || place.vicinity || '—',
-            website: place.website || null,
-            rating: place.rating || null,
-            reviews: place.user_ratings_total || 0,
-            prods: prods.length ? prods : ['amatista','lp-ars'],
-            fuenteReal: true
-          });
-        }
+      const query = encodeURIComponent(`${si.kw}`);
+      const tsUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${query}&location=${lat},${lng}&radius=${radius}&language=es&key=${GOOGLE_API_KEY}`;
+      const tsRes = await fetch(tsUrl);
+      const tsData = await tsRes.json();
+
+      if(!tsData.results) continue;
+
+      // 3. Por cada resultado: pedir detalles con teléfono y web
+      for(const place of tsData.results.slice(0, 6)){
+        document.getElementById('lstep').textContent = `Obteniendo datos de ${place.name}...`;
+        let tel = '—', website = null, address = place.formatted_address || place.vicinity || '—';
+
+        try {
+          const detUrl = `https://maps.googleapis.com/maps/api/place/details/json?place_id=${place.place_id}&fields=formatted_phone_number,international_phone_number,website,formatted_address&language=es&key=${GOOGLE_API_KEY}`;
+          const detRes = await fetch(detUrl);
+          const detData = await detRes.json();
+          if(detData.result){
+            tel = detData.result.formatted_phone_number || detData.result.international_phone_number || '—';
+            website = detData.result.website || null;
+            address = detData.result.formatted_address || address;
+          }
+        } catch(e){}
+
+        allResults.push({
+          nombre: place.name,
+          spec, label: si.label, icon: si.icon,
+          tel, dir: address, website,
+          rating: place.rating || null,
+          reviews: place.user_ratings_total || 0,
+          prods: prods.length ? prods : ['amatista','lp-ars'],
+          fuenteReal: true
+        });
       }
     }
 
     document.getElementById('loadOv').classList.remove('active');
 
     if(!allResults.length){
-      showToast('Sin resultados — usando datos simulados','info');
+      showToast('Sin resultados en la zona — probá con más radio','info');
       buscarSimulado(loc, specs, prods);
       return;
     }
 
     searchResults = allResults;
     renderCards();
-    document.getElementById('rTitle').textContent = `${allResults.length} profesionales reales en ${loc}`;
-    document.getElementById('rSub').textContent = '📍 Datos reales de Google Maps';
+    document.getElementById('rTitle').textContent = `${allResults.length} profesionales en ${loc}`;
+    document.getElementById('rSub').textContent = `📍 Datos reales · Radio ${radius/1000} km · Google Maps`;
     switchVista('busqueda', document.querySelector('.vtab'));
     showToast(`✅ ${allResults.length} resultados reales de Google`,'success');
 
   } catch(err){
     document.getElementById('loadOv').classList.remove('active');
     console.error(err);
-    showToast('Usando datos simulados — verificá conexión','info');
+    showToast('Error de conexión — usando datos simulados','info');
     buscarSimulado(loc, specs, prods);
   }
 }
